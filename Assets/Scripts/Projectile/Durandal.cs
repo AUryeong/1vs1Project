@@ -9,8 +9,6 @@ public class Durandal : Projectile
     float downWaitDuration = 3;
     float downFadeOutDuration = 1;
 
-    private Vector2 normalVector;
-
     SpriteRenderer spriteRenderer;
 
     void Awake()
@@ -31,7 +29,8 @@ public class Durandal : Projectile
         spriteRenderer.color = Color.white;
 
         transform.position = Player.Instance.transform.position;
-        normalVector = (wantPos-transform.position).normalized;
+        float angle = Mathf.Atan2(wantPos.y - transform.position.y, wantPos.x - transform.position.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0,0,angle+180);
 
         transform.localScale = size;
         StartCoroutine(OnDownCoroutine());
@@ -39,7 +38,7 @@ public class Durandal : Projectile
 
     void Update()
     {
-        transform.Translate(normalVector * (Time.deltaTime * 300), Space.World);
+        transform.Translate(Vector2.left * (Time.deltaTime * 25));
     }
     IEnumerator OnDownCoroutine()
     {

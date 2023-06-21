@@ -7,9 +7,7 @@ using TMPro;
 public class ItemInven : MonoBehaviour
 {
     protected Item _item;
-    [SerializeField]protected Image image;
-    [SerializeField]
-    protected TextMeshProUGUI lvText;
+    [SerializeField] protected TextMeshProUGUI itemText;
 
     public RectTransform rectTransform
     {
@@ -28,8 +26,7 @@ public class ItemInven : MonoBehaviour
         set
         {
             _item = value;
-            image.sprite = _item.icon;
-            lvText.text = "LV: " + (_item.upgrade - 1);
+            itemText.text = _item.GetName();
         }
     }
 }

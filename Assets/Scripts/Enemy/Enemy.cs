@@ -58,7 +58,7 @@ public class Enemy : Unit
         if (collider2D == null) return;
 
         if (collider2D.CompareTag("Camera"))
-            GameManager.Instance.inCameraEnemies.Remove(this);
+            InGameManager.Instance.inCameraEnemies.Remove(this);
     }
 
     public virtual void OnHurt(Projectile projectile, bool isSkipHitable = false)
@@ -81,11 +81,11 @@ public class Enemy : Unit
             if (Random.Range(0f, 100f) <= stat.evade)
             {
                 if (!isSkipText)
-                    GameManager.Instance.ShowText("MISS", transform.position, Color.white);
+                    InGameManager.Instance.ShowText("MISS", transform.position, Color.white);
                 return;
             }
         if (!isSkipText)
-            GameManager.Instance.ShowInt((int)damage, transform.position, Color.white);
+            InGameManager.Instance.ShowInt((int)damage, transform.position, Color.white);
 
         stat.hp -= damage;
         if (enemyFlashWhiteCo != null)
@@ -101,7 +101,7 @@ public class Enemy : Unit
         SoundManager.Instance.PlaySound("enemy 1", SoundType.SE, 0.8f);
 
         dying = true;
-        GameManager.Instance.OnKill(this);
+        InGameManager.Instance.OnKill(this);
         Player.Instance.OnKill(this);
 
         transform.DOMoveX(transform.position.x + ((direction == Direction.Left) ? 1 : -1), 0.5f);
@@ -117,7 +117,7 @@ public class Enemy : Unit
         if (collider2D == null) return;
 
         if (collider2D.CompareTag("Camera"))
-            GameManager.Instance.inCameraEnemies.Add(this);
+            InGameManager.Instance.inCameraEnemies.Add(this);
 
         else if (collider2D.CompareTag("Projectile"))
             OnHurt(collider2D.GetComponent<Projectile>());
@@ -125,7 +125,7 @@ public class Enemy : Unit
 
     protected IEnumerator HitFlashWhite()
     {
-        spriteRenderer.material = GameManager.Instance.flashWhiteMaterial;
+        spriteRenderer.material = InGameManager.Instance.flashWhiteMaterial;
         yield return new WaitForSeconds(0.2f);
         spriteRenderer.material = originalMaterial;
     }

@@ -55,20 +55,10 @@ public class ResourcesManager : Singleton<ResourcesManager>
                 lore.Add(texts[i + 2]);
             }
 
-            item.Init(itemName, lore.ToArray(), lore.Count - 1, GetItemIcon(codeItemName));
+            item.Init(itemName, lore.ToArray(), lore.Count - 1);
 
             items.Add(codeItemName, item);
         }
-    }
-
-    public Sprite GetItemIcon(string spriteName)
-    {
-        if (!itemIcons.ContainsKey(spriteName))
-        {
-            Debug.LogAssertion("Sprite not found : " + spriteName);
-            return null;
-        }
-        return itemIcons[spriteName];
     }
 
     public GameObject GetProjectile(string projectileName)

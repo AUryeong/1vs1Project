@@ -12,21 +12,17 @@ public class Item
     public int upgrade { get; private set; }
     protected int maxUpgrade;
 
-    public Sprite icon { get; protected set; }
-
     /// <summary>
     /// 아이템 생성시 발동
     /// </summary>
     /// <param name="name">아이템 이름</param>
     /// <param name="lore">아이템 설명들</param>
     /// <param name="maxUpgrade">최대 업그레이드 횟수</param>
-    /// <param name="icon">아이템 아이콘</param>
-    public void Init(string name, string[] lore, int maxUpgrade, Sprite icon)
+    public void Init(string name, string[] lore, int maxUpgrade)
     {
         this.name = name;
         this.lore = lore;
         this.maxUpgrade = maxUpgrade;
-        this.icon = icon;
         OnReset();
     }
 
@@ -108,8 +104,8 @@ public class Item_Durandal : Item
     private float cooltime;
 
     //업그레이드
-    readonly private float threeCooltimePercent = 0.8f;
-    readonly private float sixCooltimePercent = 0.7f;
+    readonly private float threeCooltimePercent = 0.6f;
+    readonly private float sixCooltimePercent = 0.4f;
 
 
     private Vector3 defaultSize = Vector3.one*0.3f;
@@ -117,8 +113,8 @@ public class Item_Durandal : Item
     private Vector3 size;
 
     //업그레이드
-    readonly private float fourSizePercent = 1.15f;
-    readonly private float sevenSizePercent = 1.3f;
+    readonly private float fourSizePercent = 1.25f;
+    readonly private float sevenSizePercent = 1.5f;
 
     public override void OnReset()
     {
@@ -174,8 +170,8 @@ public class Item_Durandal : Item
 
             durandalEclipse.item = this;
             Vector3 pos;
-            if (GameManager.Instance.inCameraEnemies.Count > 0)
-                pos = RandomManager.SelectOne(GameManager.Instance.inCameraEnemies).transform.position + Random.onUnitSphere;
+            if (InGameManager.Instance.inCameraEnemies.Count > 0)
+                pos = RandomManager.SelectOne(InGameManager.Instance.inCameraEnemies).transform.position + Random.onUnitSphere;
             else
                 pos = Player.Instance.transform.position + Random.onUnitSphere * randomDistance;
 

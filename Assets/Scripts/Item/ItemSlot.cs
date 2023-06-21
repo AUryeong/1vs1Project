@@ -1,4 +1,4 @@
-using System.Collections;
+    using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -8,7 +8,6 @@ using DG.Tweening;
 
 public class ItemSlot : MonoBehaviour
 {
-    [SerializeField] Image itemIcon;
     [SerializeField] TextMeshProUGUI itemName;
     [SerializeField] TextMeshProUGUI itemLore;
     Image slotImage;
@@ -27,7 +26,6 @@ public class ItemSlot : MonoBehaviour
         set
         {
             _item = value;
-            itemIcon.sprite = _item.icon;
             itemName.text = "[ " + _item.GetName() + " ]";
             itemLore.text = _item.GetLore();
         }
@@ -43,13 +41,11 @@ public class ItemSlot : MonoBehaviour
 
     public void SlotSelect()
     {
-        slotImage.sprite = UIManager.Instance.selectSlotSprite;
         rectTransform.DOAnchorPosX(selectMovePosX, 0.3f).SetUpdate(true);
     }
 
     public void SlotDeselect()
     {
-        slotImage.sprite = UIManager.Instance.deselectSlotSprite;
         rectTransform.DOAnchorPosX(deselectMovePosX, 0.3f).SetUpdate(true);
     }
 }
