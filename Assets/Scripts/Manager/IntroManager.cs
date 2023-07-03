@@ -16,11 +16,24 @@ public class IntroManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI textMeshProUGUI;
 
     private Vector2 vector;
+    public Image image;
 
     private void Start()
     {
         vector = car.rectTransform.anchoredPosition;
+        image.gameObject.SetActive(false);
         StartCoroutine(Intro());
+    }
+
+    IEnumerator FadeIn()
+    {
+        image.gameObject.SetActive(true);
+        while (image.color.a < 1)
+        {
+            image.color = new Color(image.color.r, image.color.g, image.color.b, image.color.a + Time.deltaTime);
+            yield return null;
+        }
+        SceneManager.LoadScene("Title");
     }
 
     IEnumerator Text(string text)
@@ -55,7 +68,7 @@ public class IntroManager : MonoBehaviour
 
     public void GoTitle()
     {
-        SceneManager.LoadScene("Title");
+        StartCoroutine(FadeIn());
     }
 
     private void Update()

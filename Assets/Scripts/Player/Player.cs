@@ -105,6 +105,10 @@ public class Player : Unit
             }
 
             gun.transform.rotation = Quaternion.AngleAxis(angle + 180, Vector3.forward);
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                Exp += maxExp;
+            }
         }
     }
 

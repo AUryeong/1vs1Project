@@ -26,6 +26,8 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private TextMeshProUGUI gameOverText;
     [SerializeField] private Button gameOverButton;
 
+    public Image image;
+
     #region 무기 인벤토리 변수
 
     [Header("무기 인벤토리 변수")] [SerializeField]
@@ -100,6 +102,8 @@ public class UIManager : Singleton<UIManager>
         gameOverButton.onClick.RemoveAllListeners();
         gameOverButton.onClick.AddListener(GameOverButton);
 
+        image.gameObject.SetActive(false);
+
         Cursor.visible = false;
 
         // gameOverWindow.gameObject.SetActive(false);
@@ -144,11 +148,22 @@ public class UIManager : Singleton<UIManager>
         
         gameOverWindow.gameObject.SetActive(true);
         int timerInt = (int)timer;
-        gameOverText.text = $"모나미 153은 {(timerInt / 60).ToString("D2") + " : " + (timerInt % 60).ToString("D2")} 만큼 생존했지만,\n지우개의 여왕을 해치우지 못하였습니다.";
+        gameOverText.text = $"모나미 153은 {(timerInt / 60).ToString("D2") + " : " + (timerInt % 60).ToString("D2")} 만큼 생존했습니다.";
     }
 
     public void GameOverButton()
-    { 
+    {
+        StartCoroutine(FadeIn());
+    }
+
+    IEnumerator FadeIn()
+    {
+        image.gameObject.SetActive(true);
+        while (image.color.a < 1)
+        {
+            image.color = new Color(image.color.r, image.color.g, image.color.b, image.color.a + Time.unscaledDeltaTime);
+            yield return null;
+        }
         SoundManager.Instance.PlaySound("button select", SoundType.SE);
 
         if (Player.Instance != null)
