@@ -6,9 +6,8 @@ using UnityEngine.Playables;
 [System.Serializable]
 public class SaveData
 {
-    public int timer = 0;
-    public int maxTimer = 0;
-    public int soundVolume = 100;
+    public float sfxVolume = 1f;
+    public float bgmVolume = 1f;
 }
 
 public class SaveManager : Singleton<SaveManager>

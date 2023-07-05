@@ -143,9 +143,6 @@ public class UIManager : Singleton<UIManager>
 
     public void GameOver()
     {
-        SaveManager.Instance.saveData.timer = (int)timer;
-        SaveManager.Instance.saveData.maxTimer = Mathf.Max((int)timer, SaveManager.Instance.saveData.maxTimer);
-        
         gameOverWindow.gameObject.SetActive(true);
         int timerInt = (int)timer;
         gameOverText.text = $"모나미 153은 {(timerInt / 60).ToString("D2") + " : " + (timerInt % 60).ToString("D2")} 만큼 생존했습니다.";

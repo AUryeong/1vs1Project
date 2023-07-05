@@ -57,3 +57,6 @@ TagManager:
   - name: UI
     uniqueID: 611797549
     locked: 0
+  - name: CameraFilter
+    uniqueID: 1419516753
+    locked: 0
