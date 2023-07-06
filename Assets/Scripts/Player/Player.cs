@@ -60,6 +60,7 @@ public class Player : Unit
 
     SpriteRenderer spriteRenderer;
     Animator animator;
+    private Rigidbody2D rigid;
     float animatorScaleSpeed = 0.2f;
 
     [SerializeField] private SpriteRenderer gun;
@@ -72,6 +73,7 @@ public class Player : Unit
         Instance = this;
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        rigid = GetComponent<Rigidbody2D>();
     }
 
     protected virtual void Start()
@@ -301,7 +303,9 @@ public class Player : Unit
             animator.speed = stat.speed / 100 * defaultStat.speed * animatorScaleSpeed;
         }
 
-        transform.position = InGameManager.Instance.GetPosInMap(transform.position + new Vector3(speedX * deltaTime, speedY * deltaTime, speedY * deltaTime), 1);
+        rigid.velocity = new Vector2(speedX, speedY );
+        transform.position = InGameManager.Instance.GetPosInMap(transform.position, 1);
+        transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.y);
     }
 
     #endregion
