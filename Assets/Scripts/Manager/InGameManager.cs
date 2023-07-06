@@ -107,7 +107,7 @@ public class InGameManager : Singleton<InGameManager>
             enemyDuration -= enemyCooltime;
             enemyPower++;
             GameObject obj = PoolManager.Instance.Init(enemyBase.gameObject);
-            obj.transform.position = Player.Instance.transform.position + (Vector3)Random.insideUnitCircle.normalized * 20;
+            obj.transform.position = Player.Instance.transform.position + (Vector3)Random.insideUnitCircle.normalized * 15;
             Enemy enemy = obj.GetComponent<Enemy>();
             enemy.stat.damage = 5 + 0.01f * enemyPower;
             enemy.stat.maxHp = 10 + 0.03f * enemyPower;
