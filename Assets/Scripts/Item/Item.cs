@@ -84,7 +84,7 @@ public class Item
 }
 
 //µÚ¶ûÄ®
-public class Item_Durandal : Item
+public class Item_Monami153 : Item
 {
     private float duration;
     readonly private float randomDistance = 4;
@@ -157,26 +157,7 @@ public class Item_Durandal : Item
 
     public override bool CanGet()
     {
-        return base.CanGet() && Player.Instance is Player_KimMinSu;
-    }
-
-    public void CreateDurandalEclipse()
-    {
-        // ½Ö°ËÀÌ¿©¼­ µÎ¹ø ¼ÒÈ¯
-        for (int i = 0; i < 2; i++)
-        {
-            GameObject projectile = ResourcesManager.Instance.GetProjectile(nameof(Durandal_Eclipse));
-            Durandal_Eclipse durandalEclipse = projectile.GetComponent<Durandal_Eclipse>();
-
-            durandalEclipse.item = this;
-            Vector3 pos;
-            if (InGameManager.Instance.inCameraEnemies.Count > 0)
-                pos = RandomManager.SelectOne(InGameManager.Instance.inCameraEnemies).transform.position + Random.onUnitSphere;
-            else
-                pos = Player.Instance.transform.position + Random.onUnitSphere * randomDistance;
-
-            durandalEclipse.OnCreate(pos);
-        }
+        return base.CanGet() && Player.Instance is Player_Monami153;
     }
 
     public override void OnShoot()
@@ -188,13 +169,13 @@ public class Item_Durandal : Item
 
         duration -= cooltime;
 
-        GameObject projectile = ResourcesManager.Instance.GetProjectile(nameof(Durandal));
-        Durandal durandal = projectile.GetComponent<Durandal>();
-        durandal.item = this;
+        GameObject projectile = ResourcesManager.Instance.GetProjectile(nameof(Monami153));
+        Monami153 monami153 = projectile.GetComponent<Monami153>();
+        monami153.item = this;
 
         Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        durandal.OnCreate(pos, size);
+        monami153.OnCreate(pos, size);
     }
 
     public override void OnUpdate(float detlaTime)
@@ -224,7 +205,7 @@ public class Item_Godbless : Item
 
     public override bool CanGet()
     {
-        return base.CanGet() && Player.Instance is Player_KimMinSu;
+        return base.CanGet() && Player.Instance is Player_Monami153;
     }
 
     public override void OnReset()
@@ -278,7 +259,7 @@ public class Item_Daybreak : Item
 
     public override bool CanGet()
     {
-        return base.CanGet() && Player.Instance is Player_KimMinSu;
+        return base.CanGet() && Player.Instance is Player_Monami153;
     }
 
     public override void OnEquip()
@@ -307,7 +288,7 @@ public class Item_Daybreak : Item
 }
 
 //ÆøÁÖÇÏ´Â ³¯°³
-public class Item_KiaraR : Item
+public class Item_AreaDamage : Item
 {
     float duration = 0;
     float cooltime = 0.3f;

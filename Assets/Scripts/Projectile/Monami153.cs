@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class Durandal : Projectile
+public class Monami153 : Projectile
 {
     float downDuration = 0.5f;
     float downWaitDuration = 3;

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 429617898271736017}
   - component: {fileID: 1640591780094404924}
   m_Layer: 0
-  m_Name: KiaraR
+  m_Name: AreaDamage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
