@@ -1,10 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class InGameManager : Singleton<InGameManager>
 {
@@ -13,11 +11,14 @@ public class InGameManager : Singleton<InGameManager>
 
     public Vector2 minPos;
     public Vector2 maxPos;
-    public bool isGaming
-    {
-        get;
-        private set;
-    }
+    
+    public bool isGaming;
+
+    #region 보스 관련 변수
+
+    public bool isBoss;
+
+    #endregion
 
     #region 몹 관련 변수
     [SerializeField] private Enemy enemyBase;
@@ -50,11 +51,13 @@ public class InGameManager : Singleton<InGameManager>
 
     public override void OnReset()
     {
-        ResourcesManager.Instance.OnReset();
-        UIManager.Instance.OnReset();
-        PoolManager.Instance.OnReset();
+        isGaming = false;
+    }
 
-        isGaming = true;
+    public void TimerSetting()
+    {
+        isBoss = true;
+        
     }
 
     public void GameOver()

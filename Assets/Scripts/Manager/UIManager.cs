@@ -26,10 +26,12 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private TextMeshProUGUI gameOverText;
     [SerializeField] private Button gameOverButton;
 
+    [SerializeField] private SpriteRenderer carImage;
 
     #region 무기 인벤토리 변수
 
-    [Header("무기 인벤토리 변수")] [SerializeField]
+    [Header("무기 인벤토리 변수")]
+    [SerializeField]
     GridLayoutGroup inventoryLayoutGroup;
 
     protected RectTransform inventoryRectTransform;
@@ -55,7 +57,6 @@ public class UIManager : Singleton<UIManager>
 
     //[SerializeField] ParticleSystem itemSlotParticle;
 
-    private Vector3 itemSlotsParentPos = new Vector3(1280, 0, 0);
     private float levelUpUIAppearDuration = 0.5f;
 
     private int itemSlotChooseIdx = 0;
@@ -87,6 +88,8 @@ public class UIManager : Singleton<UIManager>
 
     public override void OnReset()
     {
+        SingletonCanvas.Instance.gameObject.SetActive(false);
+
         levelUpUI.gameObject.SetActive(false);
         gameOverWindow.gameObject.SetActive(false);
         itemSlotActiviting = false;
@@ -97,21 +100,37 @@ public class UIManager : Singleton<UIManager>
 
         inventoryRectTransform.DOAnchorPosX(itemInventoryFadeOutPosX, itemInventoryFadeDuration);
         inventoryRectTransform.DOScaleX(1, itemInventoryFadeDuration);
-        
+
         gameOverButton.onClick.RemoveAllListeners();
         gameOverButton.onClick.AddListener(GameOverButton);
 
         TransitionManager.Instance.background.gameObject.SetActive(false);
         TransitionManager.Instance.transitionSquare.gameObject.SetActive(false);
 
-        TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade);
+        Player.Instance.gameObject.SetActive(false);
+        TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade, () => StartCoroutine(CarIntro()));
 
         Cursor.visible = false;
 
-        timer = 0;
+        timer = 120;
 
         UpdateLevel();
         UpdateHp(1);
+    }
+
+    IEnumerator CarIntro()
+    {
+        carImage.gameObject.SetActive(true);
+        carImage.transform.position = new Vector2(16, 0);
+        carImage.transform.DOMoveX(0, 2f).SetEase(Ease.OutQuad);
+        yield return new WaitForSeconds(3);
+
+        SingletonCanvas.Instance.gameObject.SetActive(true);
+        Player.Instance.gameObject.SetActive(true);
+        InGameManager.Instance.isGaming = true;
+
+        yield return new WaitForSeconds(1);
+        carImage.transform.DOMoveX(-48, 6f).SetEase(Ease.InBack).OnComplete(() => { carImage.gameObject.SetActive(false); });
     }
 
     public void UpdateHp(float value)
@@ -296,9 +315,19 @@ public class UIManager : Singleton<UIManager>
 
     private void UpdateTimer()
     {
-        timer += Time.deltaTime;
-        int timerInt = (int)timer;
-        timerText.text = "생존 시간 " + (timerInt / 60).ToString("D2") + " : " + (timerInt % 60).ToString("D2");
+        if (InGameManager.Instance.isBoss) return;
+        
+        timer -= Time.deltaTime;
+        if (timer <= 0)
+        {
+            InGameManager.Instance.TimerSetting();
+            timerText.text = "보스 출현";
+            return;
+
+        }
+
+        int timerInt = Mathf.CeilToInt(timer);
+        timerText.text = "남은 시간 " + (timerInt / 60).ToString("D2") + " : " + (timerInt % 60).ToString("D2");
     }
 
     #endregion

@@ -89,7 +89,7 @@ public class TransitionManager : Singleton<TransitionManager>
         blackBackground.color = new Color(blackBackground.color.r, blackBackground.color.g, blackBackground.color.b, 1);
         while (blackBackground.color.a > 0)
         {
-            blackBackground.color = new Color(blackBackground.color.r, blackBackground.color.g, blackBackground.color.b, blackBackground.color.a - Time.unscaledDeltaTime);
+            blackBackground.color = new Color(blackBackground.color.r, blackBackground.color.g, blackBackground.color.b, blackBackground.color.a - Time.unscaledDeltaTime/2);
             yield return null;
         }
         blackBackground.gameObject.SetActive(false);
@@ -102,7 +102,7 @@ public class TransitionManager : Singleton<TransitionManager>
         blackBackground.color = new Color(blackBackground.color.r, blackBackground.color.g, blackBackground.color.b, 0);
         while (blackBackground.color.a < 1)
         {
-            blackBackground.color = new Color(blackBackground.color.r, blackBackground.color.g, blackBackground.color.b, blackBackground.color.a + Time.unscaledDeltaTime);
+            blackBackground.color = new Color(blackBackground.color.r, blackBackground.color.g, blackBackground.color.b, blackBackground.color.a + Time.unscaledDeltaTime/2);
             yield return null;
         }
         action?.Invoke();
