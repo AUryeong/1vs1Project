@@ -13,11 +13,6 @@ public class TitleManager : MonoBehaviour
 {
     [SerializeField] protected Image black;
 
-    [Header("화면 연출")]
-    [SerializeField] private SpriteRenderer background;
-    [SerializeField] private MeshRenderer transitionSquare;
-    private bool isSceneTransitioning = false; 
-
     [Space(10f)] 
     [SerializeField] protected Image title;
     
@@ -35,9 +30,11 @@ public class TitleManager : MonoBehaviour
 
     private void Awake()
     {
+        Camera.main.transform.position = new Vector3(0, 0, -10);
+        SingletonCanvas.Instance.gameObject.SetActive(false);
+
         black.gameObject.SetActive(false);
-        background.gameObject.SetActive(false);
-        transitionSquare.gameObject.SetActive(false);
+        TransitionManager.Instance.blackBackground.gameObject.SetActive(false);
 
         bgmSlider.onValueChanged.RemoveAllListeners();
         bgmSlider.value = SaveManager.Instance.saveData.bgmVolume;
@@ -53,46 +50,10 @@ public class TitleManager : MonoBehaviour
             SoundManager.Instance.VolumeChange(SoundType.SE, value);  
         });
 
-        isSceneTransitioning = false;
         
         StartCoroutine(FadeOut());
     }
 
-    private void TransitionFadeIn(Action action = null)
-    {
-        if (isSceneTransitioning) return;
-        
-        isSceneTransitioning = true;
-        background.gameObject.SetActive(true);
-        transitionSquare.gameObject.SetActive(true);
-        transitionSquare.transform.localScale = Vector3.one * 30;
-
-        transitionSquare.transform.DOScale(Vector3.zero, 1).SetEase(Ease.InQuad).OnComplete(() =>
-        {
-            isSceneTransitioning = false;
-            action?.Invoke();
-        });
-    }
-
-    private void TransitionFadeOut(Action action = null)
-    {
-        if (isSceneTransitioning) return;
-        
-        isSceneTransitioning = true;
-        background.gameObject.SetActive(true);
-        transitionSquare.gameObject.SetActive(true);
-        transitionSquare.transform.localScale = Vector3.zero;
-
-        transitionSquare.transform.DOScale(Vector3.one * 30, 1).SetEase(Ease.OutQuad).SetDelay(0.5f).OnComplete(() =>
-        {
-            isSceneTransitioning = false;
-            
-            background.gameObject.SetActive(false);
-            transitionSquare.gameObject.SetActive(false);
-            
-            action?.Invoke();
-        });
-    }
 
     IEnumerator FadeOut()
     {
@@ -108,23 +69,27 @@ public class TitleManager : MonoBehaviour
 
     public void GameStart()
     {
-        TransitionFadeIn(() => SceneManager.LoadScene("InGame"));
+        TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () => 
+        {
+            SceneManager.LoadScene("InGame");
+        });
     }
 
     public void Back()
     {
-        TransitionFadeIn(() =>
+        TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () =>
         {
             title.gameObject.SetActive(true);
             credit.gameObject.SetActive(false);
             setting.gameObject.SetActive(false);
-            TransitionFadeOut();
+
+            TransitionManager.Instance.TransitionFadeOut();
         });
     }
 
     public void Credit()
     {
-        TransitionFadeIn(() =>
+        TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () =>
         {
             title.gameObject.SetActive(false);
             credit.gameObject.SetActive(true);
@@ -136,14 +101,14 @@ public class TitleManager : MonoBehaviour
             producerBottom.DOKill();
             producerBottom.rectTransform.anchoredPosition = new Vector2(0, 109f);
             producerBottom.rectTransform.DOAnchorPosY(-100, 1).SetDelay(1);
-            
-            TransitionFadeOut();
+
+            TransitionManager.Instance.TransitionFadeOut();
         });
     }
 
     public void Setting()
     {
-        TransitionFadeIn(() =>
+        TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () =>
         {
             title.gameObject.SetActive(false);
             setting.gameObject.SetActive(true);
@@ -155,13 +120,13 @@ public class TitleManager : MonoBehaviour
             sfxWhiteBox.DOKill();
             sfxWhiteBox.rectTransform.anchoredPosition = new Vector2(-925f, sfxWhiteBox.rectTransform.anchoredPosition.y);
             sfxWhiteBox.rectTransform.DOAnchorPosX(560, 1).SetDelay(1.5f).SetEase(Ease.OutBack);
-            
-            TransitionFadeOut();
+
+            TransitionManager.Instance.TransitionFadeOut();
         });
     }
 
     public void GameEnd()
     {
-        TransitionFadeIn(Application.Quit);
+        TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, Application.Quit);
     }
 }

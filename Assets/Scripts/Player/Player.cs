@@ -304,6 +304,7 @@ public class Player : Unit
         }
 
         rigid.velocity = new Vector2(speedX, speedY );
+
         transform.position = InGameManager.Instance.GetPosInMap(transform.position, 1);
         transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.y);
     }

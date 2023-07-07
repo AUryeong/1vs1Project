@@ -26,7 +26,6 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private TextMeshProUGUI gameOverText;
     [SerializeField] private Button gameOverButton;
 
-    public Image image;
 
     #region 무기 인벤토리 변수
 
@@ -102,11 +101,12 @@ public class UIManager : Singleton<UIManager>
         gameOverButton.onClick.RemoveAllListeners();
         gameOverButton.onClick.AddListener(GameOverButton);
 
-        image.gameObject.SetActive(false);
+        TransitionManager.Instance.background.gameObject.SetActive(false);
+        TransitionManager.Instance.transitionSquare.gameObject.SetActive(false);
+
+        TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade);
 
         Cursor.visible = false;
-
-        // gameOverWindow.gameObject.SetActive(false);
 
         timer = 0;
 
@@ -150,30 +150,23 @@ public class UIManager : Singleton<UIManager>
 
     public void GameOverButton()
     {
-        StartCoroutine(FadeIn());
-    }
-
-    IEnumerator FadeIn()
-    {
-        image.gameObject.SetActive(true);
-        while (image.color.a < 1)
+        TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade, () =>
         {
-            image.color = new Color(image.color.r, image.color.g, image.color.b, image.color.a + Time.unscaledDeltaTime);
-            yield return null;
-        }
-        SoundManager.Instance.PlaySound("button select", SoundType.SE);
+            SoundManager.Instance.PlaySound("button select", SoundType.SE);
 
-        if (Player.Instance != null)
-            Destroy(Player.Instance.gameObject);
+            if (Player.Instance != null)
+                Destroy(Player.Instance.gameObject);
 
-        Cursor.visible = true;
-        DOTween.KillAll();
-        PoolManager.Instance.GameEnd();
-        SingletonCanvas.Instance.gameObject.SetActive(false);
+            DOTween.KillAll();
+            Cursor.visible = true;
+            Time.timeScale = 1;
+            PoolManager.Instance.GameEnd();
 
-        Time.timeScale = 1;
-        SceneManager.LoadScene("Title");
+            SceneManager.LoadScene("Title");
+            TransitionManager.Instance.TransitionFadeOut();
+        });
     }
+
     #endregion
 
     #region 무기 인벤토리 함수
