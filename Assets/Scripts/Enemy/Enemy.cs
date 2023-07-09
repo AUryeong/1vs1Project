@@ -29,6 +29,8 @@ public class Enemy : Unit
 
     protected virtual void Update()
     {
+        if (!InGameManager.Instance.isGaming) return;
+        
         float deltaTime = Time.deltaTime;
         if (!dying)
         {
@@ -36,7 +38,7 @@ public class Enemy : Unit
         }
     }
 
-    void Move(float deltaTime)
+    protected virtual void Move(float deltaTime)
     {
         transform.Translate(stat.speed * deltaTime * (Player.Instance.transform.position - transform.position).normalized);
         transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.y);
@@ -94,11 +96,16 @@ public class Enemy : Unit
 
         if (stat.hp > 0)
         {
-            SoundManager.Instance.PlaySound("hurt", SoundType.SE, 0.8f, 0.5f);
+            SoundManager.Instance.PlaySound("hurt", SoundType.SE, 0.5f);
             return;
         }
-        SoundManager.Instance.PlaySound("enemy", SoundType.SE, 0.6f);
-        SoundManager.Instance.PlaySound("enemy 1", SoundType.SE, 0.8f);
+        Die();
+    }
+
+    protected virtual void Die()
+    {
+        SoundManager.Instance.PlaySound("enemy", SoundType.SE, 0.4f);
+        SoundManager.Instance.PlaySound("enemy 1", SoundType.SE, 0.5f);
 
         dying = true;
         InGameManager.Instance.OnKill(this);
@@ -115,6 +122,7 @@ public class Enemy : Unit
     {
         if (dying) return;
         if (collider2D == null) return;
+        if (!InGameManager.Instance.isGaming) return;
 
         if (collider2D.CompareTag("Camera"))
             InGameManager.Instance.inCameraEnemies.Add(this);

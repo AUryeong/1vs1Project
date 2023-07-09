@@ -9,6 +9,8 @@ public class Monami153 : Projectile
     float downWaitDuration = 3;
     float downFadeOutDuration = 1;
 
+    private bool isPenetrating = false;
+
     SpriteRenderer spriteRenderer;
 
     void Awake()
@@ -18,7 +20,13 @@ public class Monami153 : Projectile
 
     public override void OnHit(Enemy enemy)
     {
-        if (item.upgrade >= 8) return;
+        if (item.upgrade >= 8)
+        {
+            if (isPenetrating)
+                gameObject.SetActive(false);
+            isPenetrating = true;
+            return;
+        }
         
         gameObject.SetActive(false);
     }
@@ -26,6 +34,7 @@ public class Monami153 : Projectile
     public void OnCreate(Vector3 wantPos, Vector3 size)
     {
         isHitable = true;
+        isPenetrating = false;
         spriteRenderer.color = Color.white;
 
         transform.position = Player.Instance.transform.position;

@@ -29,7 +29,7 @@ public class Player : Unit
             {
                 exp -= maxExp;
                 lv++;
-                maxExp = Mathf.Pow(lv, 1.3f) * 100;
+                maxExp = Mathf.Pow(lv, 1.5f) * 100;
                 InGameManager.Instance.AddWeapon();
             }
 
@@ -111,6 +111,11 @@ public class Player : Unit
             {
                 Exp += maxExp;
             }
+        }
+        else
+        {
+            rigid.velocity = Vector2.zero;
+            animator.SetBool("isWalking", false);
         }
     }
 
@@ -274,12 +279,14 @@ public class Player : Unit
         {
             speedX = stat.speed / 100 * defaultStat.speed;
             spriteRenderer.flipX = true;
+            gun.transform.localPosition = new Vector3(0.3f, gun.transform.localPosition.y, gun.transform.localPosition.z);
         }
 
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             speedX -= stat.speed / 100 * defaultStat.speed;
             spriteRenderer.flipX = false;
+            gun.transform.localPosition = new Vector3(-0.3f, gun.transform.localPosition.y, gun.transform.localPosition.z);
         }
 
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))

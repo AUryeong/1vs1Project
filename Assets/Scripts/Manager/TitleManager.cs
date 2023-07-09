@@ -7,7 +7,6 @@ using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
 using UnityEngine.Serialization;
-using Random = UnityEngine.Random;
 
 public class TitleManager : MonoBehaviour
 {
@@ -28,10 +27,11 @@ public class TitleManager : MonoBehaviour
     [SerializeField] private Image sfxWhiteBox;
     [SerializeField] private Slider sfxSlider;
 
+    [SerializeField] private Image howToPlay;
+
     private void Awake()
     {
         Camera.main.transform.position = new Vector3(0, 0, -10);
-        SingletonCanvas.Instance.gameObject.SetActive(false);
 
         black.gameObject.SetActive(false);
         TransitionManager.Instance.blackBackground.gameObject.SetActive(false);
@@ -49,8 +49,8 @@ public class TitleManager : MonoBehaviour
         {
             SoundManager.Instance.VolumeChange(SoundType.SE, value);  
         });
-
         
+        SoundManager.Instance.PlaySound("title", SoundType.BGM);
         StartCoroutine(FadeOut());
     }
 
@@ -82,11 +82,22 @@ public class TitleManager : MonoBehaviour
             title.gameObject.SetActive(true);
             credit.gameObject.SetActive(false);
             setting.gameObject.SetActive(false);
+            howToPlay.gameObject.SetActive(false);
 
             TransitionManager.Instance.TransitionFadeOut();
         });
     }
 
+    public void HowToPlay()
+    {
+        TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () =>
+        {
+            title.gameObject.SetActive(false);
+            howToPlay.gameObject.SetActive(true);
+
+            TransitionManager.Instance.TransitionFadeOut();
+        });
+    }
     public void Credit()
     {
         TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () =>

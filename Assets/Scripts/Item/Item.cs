@@ -104,8 +104,8 @@ public class Item_Monami153 : Item
     private float cooltime;
 
     //업그레이드
-    readonly private float threeCooltimePercent = 0.6f;
-    readonly private float sixCooltimePercent = 0.4f;
+    readonly private float threeCooltimePercent = 0.7f;
+    readonly private float sixCooltimePercent = 0.5f;
 
 
     private Vector3 defaultSize = Vector3.one*0.3f;
@@ -318,7 +318,7 @@ public class Item_AreaDamage : Item
     public override void OnEquip()
     {
         base.OnEquip();
-        auraObj = ResourcesManager.Instance.GetProjectile("KiaraR");
+        auraObj = ResourcesManager.Instance.GetProjectile("AreaDamage");
         auraObj.transform.localScale = size;
         auraObj.GetComponent<Projectile>().isHitable = false;
     }
