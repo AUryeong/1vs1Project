@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using UnityEngine.SceneManagement;
 
 public class Player : Unit
 {
@@ -10,18 +8,21 @@ public class Player : Unit
 
     //캐릭터 기본 스텟, 일반 stat은 퍼센트로 표현
     public Stat defaultStat;
-    private List<Item> items = new List<Item>();
+    private readonly List<Item> items = new List<Item>();
 
     #region 레벨 변수
 
     public float xpAdd = 100f;
     public int lv = 0;
-    protected float exp = 0;
+    private float exp = 0;
     public float maxExp = 100f;
 
     public float Exp
     {
-        get { return exp; }
+        get
+        {
+            return exp;
+        }
         set
         {
             exp = value * xpAdd / 100;
@@ -41,16 +42,15 @@ public class Player : Unit
 
     #region 몹 충돌 변수
 
-    protected bool inv = false;
-    protected bool hurtInv = false;
+    private bool hurtInv;
 
-    Color hitTextColor = new Color(255 / 255f, 66 / 255f, 66 / 255f);
-    Color healTextColor = new Color(101 / 255f, 255 / 255f, 76 / 255f);
-    float hitFadeInAlpha = 0.8f;
-    float hitFadeOutAlpha = 1f;
-    float hitFadeTime = 0.1f;
+    private readonly Color hitTextColor = new Color(255 / 255f, 66 / 255f, 66 / 255f);
+    private readonly Color healTextColor = new Color(101 / 255f, 255 / 255f, 76 / 255f);
+    private readonly float hitFadeInAlpha = 0.8f;
+    private readonly float hitFadeOutAlpha = 1f;
+    private readonly float hitFadeTime = 0.1f;
 
-    float damageRandomPercent = 10;
+    private readonly float damageRandomPercent = 10;
 
     [HideInInspector] public List<Enemy> collisionEnemyList = new List<Enemy>();
 
@@ -58,12 +58,14 @@ public class Player : Unit
 
     #region 애니메이션 변수
 
-    SpriteRenderer spriteRenderer;
-    Animator animator;
-    private Rigidbody2D rigid;
-    float animatorScaleSpeed = 0.2f;
-
     [SerializeField] private SpriteRenderer gun;
+
+    private SpriteRenderer spriteRenderer;
+    private Animator animator;
+    private Rigidbody2D rigid;
+    
+    private readonly float animatorScaleSpeed = 0.2f;
+    private static readonly int isWalkingHash = Animator.StringToHash("isWalking");
 
     #endregion
 
@@ -85,13 +87,13 @@ public class Player : Unit
         if (UIManager.Instance.IsActable())
         {
             float deltaTime = Time.deltaTime;
-            Move(deltaTime);
+            Move();
             HitCheck();
-            ArrowUpdate();
+            ShootUpdate();
             foreach (Item item in items)
                 item.OnUpdate(deltaTime);
 
-            var mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            var mouse = GameManager.Instance.MainCamera.ScreenToWorldPoint(Input.mousePosition);
             float angle = Mathf.Atan2(mouse.y - gun.transform.position.y, mouse.x - gun.transform.position.x) * Mathf.Rad2Deg;
             gun.flipY = (mouse.x - gun.transform.position.x >= 0);
             if (gun.flipY)
@@ -115,7 +117,7 @@ public class Player : Unit
         else
         {
             rigid.velocity = Vector2.zero;
-            animator.SetBool("isWalking", false);
+            animator.SetBool(isWalkingHash, false);
         }
     }
 
@@ -135,7 +137,7 @@ public class Player : Unit
 
     public void AddItem(Item addItem)
     {
-        Item item = items.Find((Item x) => x == addItem);
+        Item item = items.Find(item => item == addItem);
         if (item == null)
         {
             item = addItem;
@@ -144,30 +146,24 @@ public class Player : Unit
         }
         else
             item.OnUpgrade();
-
-        UIManager.Instance.UpdateItemInven(item);
     }
 
     #endregion
 
-    #region 화살표 함수
+    #region 총 함수
 
-    protected void ArrowUpdate()
+    private void ShootUpdate()
     {
         if (Input.GetMouseButton(0))
-        {
             foreach (var item in items)
-            {
                 item.OnShoot();
-            }
-        }
     }
 
     #endregion
 
     #region 몹 충돌 함수
 
-    protected void Die()
+    private void Die()
     {
         InGameManager.Instance.GameOver();
     }
@@ -197,16 +193,16 @@ public class Player : Unit
             InGameManager.Instance.ShowInt((int)healAmount, transform.position, healTextColor);
     }
 
-    public void TakeDamage(float damage, bool invAttack = false, bool isSkipText = false)
+    private void TakeDamage(float damage, bool invAttack = false, bool isSkipText = false)
     {
-        if (invAttack || inv)
+        if (invAttack)
         {
             if (!isSkipText)
                 InGameManager.Instance.ShowText("MISS", transform.position, Color.white);
             return;
         }
 
-        SoundManager.Instance.PlaySound("hurt", SoundType.SE);
+        SoundManager.Instance.PlaySound("hurt");
         stat.hp -= damage;
         if (stat.hp <= 0)
         {
@@ -239,7 +235,7 @@ public class Player : Unit
             collisionEnemyList.Remove(collider2D.GetComponent<Enemy>());
     }
 
-    protected void HitCheck()
+    private void HitCheck()
     {
         if (hurtInv || stat.hp <= 0) return;
 
@@ -270,7 +266,7 @@ public class Player : Unit
 
     #region 이동 함수
 
-    protected void Move(float deltaTime)
+    private void Move()
     {
         float speedX = 0;
         float speedY = 0;
@@ -301,12 +297,12 @@ public class Player : Unit
 
         if (speedX == 0 && speedY == 0)
         {
-            animator.SetBool("isWalking", false);
+            animator.SetBool(isWalkingHash, false);
             animator.speed = 1;
         }
         else
         {
-            animator.SetBool("isWalking", true);
+            animator.SetBool(isWalkingHash, true);
             animator.speed = stat.speed / 100 * defaultStat.speed * animatorScaleSpeed;
         }
 

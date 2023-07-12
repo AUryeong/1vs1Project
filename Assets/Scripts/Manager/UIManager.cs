@@ -1,16 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
-using UnityEngine.SceneManagement;
-
-public enum GameOverButton
-{
-    Restart,
-    Title
-}
+using UnityEngine.Serialization;
 
 public class UIManager : Singleton<UIManager>
 {
@@ -33,52 +26,19 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private TextMeshProUGUI gameWinText;
     [SerializeField] private Button gameWinButton;
 
-    #region 무기 인벤토리 변수
-
-    [Header("무기 인벤토리 변수")]
-    [SerializeField]
-    GridLayoutGroup inventoryLayoutGroup;
-
-    protected RectTransform inventoryRectTransform;
-
-    [SerializeField] ItemInven itemInventoryImage;
-    protected List<ItemInven> itemInventories = new List<ItemInven>();
-
-    private float itemInventoryFadeInPosX = 160f;
-    private float itemInventoryFadeOutPosX = -56f;
-    private float itemInventoryFadeDuration = 0.3f;
-
-    private bool inventoryOpen = true;
-
-    #endregion
-
     #region 무기 획득 변수
 
-    [Header("무기 획득 변수")] [SerializeField] GameObject levelUpUI;
-    [SerializeField] TMP_Text levelUpText;
+    [Header("무기 획득 변수")] 
+    [SerializeField] private GameObject levelUpUI;
+    [SerializeField] private ItemSlot[] itemSlots;
 
-    [SerializeField] RectTransform itemSlotsParent;
-    [SerializeField] ItemSlot[] itemSlots;
-
-    //[SerializeField] ParticleSystem itemSlotParticle;
-
-    private float levelUpUIAppearDuration = 0.5f;
-
-    private int itemSlotChooseIdx = 0;
-    private bool itemSlotActiviting = false;
-
-    private float deselctItemSlotMovePosX = 1500;
-    private float selctItemSlotMovePosX = -2000;
-    private float ItemSlotMoveDuration = 1;
-
-    private float levelUpTextSinPower = 15;
-    private float levelUpTextSinAdder = 0.5f;
+    private bool itemSlotActivating;
 
     #endregion
 
     #region 타이머 변수
 
-    [Header("타이머 변수")] [SerializeField] TextMeshProUGUI timerText;
+    [Header("타이머 변수")] [SerializeField] private TextMeshProUGUI timerText;
 
     #endregion
 
@@ -107,10 +67,8 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private Button scoreNextStageButton;
 
 
-    public override void OnReset()
+    protected override void OnCreated()
     {
-        SingletonCanvas.Instance.gameObject.SetActive(false);
-
         levelUpUI.gameObject.SetActive(false);
         gameOverWindow.gameObject.SetActive(false);
         gameWinWindow.gameObject.SetActive(false);
@@ -118,14 +76,8 @@ public class UIManager : Singleton<UIManager>
         bossWarning.gameObject.SetActive(false);
         scoreBackground.gameObject.SetActive(false);
         moveBackground.gameObject.SetActive(false);
-        itemSlotActiviting = false;
-
-        inventoryOpen = true;
-        itemInventories.Clear();
-        inventoryRectTransform = inventoryLayoutGroup.GetComponent<RectTransform>();
-
-        inventoryRectTransform.DOAnchorPosX(itemInventoryFadeOutPosX, itemInventoryFadeDuration);
-        inventoryRectTransform.DOScaleX(1, itemInventoryFadeDuration);
+        
+        itemSlotActivating = false;
 
         gameOverButton.onClick.RemoveAllListeners();
         gameOverButton.onClick.AddListener(GameOverButton);
@@ -157,10 +109,7 @@ public class UIManager : Singleton<UIManager>
         moveBackground.gameObject.SetActive(true);
 
         moveBackground.color = moveBackground.color.FadeChange(0);
-        moveBackground.DOFade(1, 1).OnComplete(() =>
-        {
-            ScoreSetting();
-        });
+        moveBackground.DOFade(1, 1).OnComplete(ScoreSetting);
         moveBackground.DOFade(0, 1).SetDelay(3).OnComplete(() => moveBackground.gameObject.SetActive(false));
 
         moveCartoon.color = moveCartoon.color.FadeChange(0);
@@ -178,7 +127,6 @@ public class UIManager : Singleton<UIManager>
 
     public void NextStageSetting()
     {
-        SingletonCanvas.Instance.gameObject.SetActive(false);
         scoreBackground.gameObject.SetActive(false);
         moveBackground.gameObject.SetActive(false);
     }
@@ -193,7 +141,6 @@ public class UIManager : Singleton<UIManager>
         }
 
         ScoreUpdate();
-        CheckInventoryUI();
     }
 
     private void ScoreUpdate()
@@ -248,69 +195,13 @@ public class UIManager : Singleton<UIManager>
         gameOverText.text = $"획득한 점수 : {InGameManager.Instance.Score}";
     }
 
-    public void GameOverButton()
+    private void GameOverButton()
     {
         TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade, () =>
         {
-            SoundManager.Instance.PlaySound("button select", SoundType.SE);
-
-            if (Player.Instance != null)
-                Destroy(Player.Instance.gameObject);
-
-            DOTween.KillAll();
-            Cursor.visible = true;
-            Time.timeScale = 1;
-            PoolManager.Instance.GameEnd();
-            SingletonCanvas.Instance.gameObject.SetActive(false);
-            InGameManager.Instance.Exit();
-
-            SceneManager.LoadScene("Title");
-            TransitionManager.Instance.TransitionFadeOut();
+            SoundManager.Instance.PlaySound("button select");
+            InGameManager.Instance.GoToTitle();
         });
-    }
-
-    #endregion
-
-    #region 무기 인벤토리 함수
-
-    private void CheckInventoryUI()
-    {
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            if (inventoryOpen)
-            {
-                inventoryRectTransform.DOAnchorPosX(itemInventoryFadeInPosX, itemInventoryFadeDuration).SetUpdate(true);
-                inventoryRectTransform.DOScaleX(0, itemInventoryFadeDuration).SetUpdate(true);
-            }
-            else
-            {
-                inventoryRectTransform.DOAnchorPosX(itemInventoryFadeOutPosX, itemInventoryFadeDuration).SetUpdate(true);
-                inventoryRectTransform.DOScaleX(1, itemInventoryFadeDuration).SetUpdate(true);
-            }
-
-            inventoryOpen = !inventoryOpen;
-        }
-    }
-
-    public void UpdateItemInven(Item item)
-    {
-        ItemInven itemInventory = itemInventories.Find((ItemInven x) => x.gameObject.activeSelf && x.item == item);
-        if (itemInventory == null)
-        {
-            itemInventory = PoolManager.Instance.Init(itemInventoryImage.gameObject).GetComponent<ItemInven>();
-            itemInventory.rectTransform.SetParent(itemInventoryImage.rectTransform.parent);
-            itemInventory.rectTransform.anchoredPosition3D = Vector3.zero;
-            itemInventory.rectTransform.localScale = Vector3.one;
-            itemInventories.Add(itemInventory);
-        }
-
-        int itemInventoryCount = itemInventories.FindAll((ItemInven x) => x.gameObject.activeSelf).Count;
-        if (itemInventoryCount <= 3)
-        {
-            inventoryLayoutGroup.constraintCount = itemInventoryCount;
-        }
-
-        itemInventory.item = item;
     }
 
     #endregion
@@ -319,7 +210,7 @@ public class UIManager : Singleton<UIManager>
 
     public void StartChooseItem(List<Item> items)
     {
-        itemSlotActiviting = true;
+        itemSlotActivating = true;
         SoundManager.Instance.PlaySound("level up");
         levelUpUI.gameObject.SetActive(true);
         Time.timeScale = 0;
@@ -331,9 +222,8 @@ public class UIManager : Singleton<UIManager>
             a.GetComponent<Button>().onClick.AddListener(() => EndChooseItem(a));
         }
 
-        itemSlotChooseIdx = 0;
-        for (int i = 0; i < itemSlots.Length; i++)
-            itemSlots[i].SlotSelect();
+        foreach (var itemSLot in itemSlots)
+            itemSLot.SlotSelect();
 
         foreach (ItemSlot itemSlot in itemSlots)
             itemSlot.rectTransform.anchoredPosition = Vector2.zero;
@@ -341,10 +231,10 @@ public class UIManager : Singleton<UIManager>
 
     private void EndChooseItem(ItemSlot chooseItemSlot)
     {
-        if (!itemSlotActiviting) return;
+        if (!itemSlotActivating) return;
         
-        itemSlotActiviting = false;
-        SoundManager.Instance.PlaySound("item get", SoundType.SE);
+        itemSlotActivating = false;
+        SoundManager.Instance.PlaySound("item get");
 
         Player.Instance.AddItem(chooseItemSlot.item);
 

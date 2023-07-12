@@ -54,16 +54,8 @@ public class Enemy : Unit
             spriteRenderer.flipX = true;
         }
     }
-    protected override void OnTriggerExit2D(Collider2D collider2D)
-    {
-        if (dying) return;
-        if (collider2D == null) return;
 
-        if (collider2D.CompareTag("Camera"))
-            InGameManager.Instance.inCameraEnemies.Remove(this);
-    }
-
-    public virtual void OnHurt(Projectile projectile, bool isSkipHitable = false)
+    protected virtual void OnHurt(Projectile projectile, bool isSkipHitable = false)
     {
         if (dying) return;
         if (!isSkipHitable && !projectile.isHitable) return;
@@ -96,7 +88,7 @@ public class Enemy : Unit
 
         if (stat.hp > 0)
         {
-            SoundManager.Instance.PlaySound("hurt", SoundType.SE, 0.5f);
+            SoundManager.Instance.PlaySound("hurt", SoundType.Se, 0.5f);
             return;
         }
         Die();
@@ -104,8 +96,8 @@ public class Enemy : Unit
 
     protected virtual void Die()
     {
-        SoundManager.Instance.PlaySound("enemy", SoundType.SE, 0.4f);
-        SoundManager.Instance.PlaySound("enemy 1", SoundType.SE, 0.5f);
+        SoundManager.Instance.PlaySound("enemy", SoundType.Se, 0.4f);
+        SoundManager.Instance.PlaySound("enemy 1", SoundType.Se, 0.5f);
 
         dying = true;
         InGameManager.Instance.OnKill(this);
@@ -124,14 +116,11 @@ public class Enemy : Unit
         if (collider2D == null) return;
         if (!InGameManager.Instance.isGaming) return;
 
-        if (collider2D.CompareTag("Camera"))
-            InGameManager.Instance.inCameraEnemies.Add(this);
-
         else if (collider2D.CompareTag("Projectile"))
             OnHurt(collider2D.GetComponent<Projectile>());
     }
 
-    protected IEnumerator HitFlashWhite()
+    private IEnumerator HitFlashWhite()
     {
         spriteRenderer.material = InGameManager.Instance.flashWhiteMaterial;
         yield return new WaitForSeconds(0.2f);

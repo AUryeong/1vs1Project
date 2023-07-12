@@ -169,11 +169,12 @@ public class Item_Monami153 : Item
 
         duration -= cooltime;
 
-        GameObject projectile = ResourcesManager.Instance.GetProjectile(nameof(Monami153));
-        Monami153 monami153 = projectile.GetComponent<Monami153>();
+        GameObject projectile = PoolManager.Instance.Init(nameof(Monami153));
+        
+        var monami153 = projectile.GetComponent<Monami153>();
         monami153.item = this;
 
-        Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 pos = GameManager.Instance.MainCamera.ScreenToWorldPoint(Input.mousePosition);
 
         monami153.OnCreate(pos, size);
     }
@@ -318,7 +319,7 @@ public class Item_AreaDamage : Item
     public override void OnEquip()
     {
         base.OnEquip();
-        auraObj = ResourcesManager.Instance.GetProjectile("AreaDamage");
+        auraObj = PoolManager.Instance.Init("AreaDamage");
         auraObj.transform.localScale = size;
         auraObj.GetComponent<Projectile>().isHitable = false;
     }

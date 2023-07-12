@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AutoDestruct : MonoBehaviour
 {
     public float duration = 1;
-    private float durationTime = 0;
+    private float durationTime;
 
     protected void OnEnable()
     {

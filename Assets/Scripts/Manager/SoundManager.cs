@@ -1,98 +1,84 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public enum SoundType
 {
-    SE,
-    BGM,
-    END
+    Se,
+    BGM
+}
+
+public class AudioInfo
+{
+    public AudioSource AudioSource { get; private set; }
+    public float volume;
+
+    public AudioInfo(AudioSource audioSource)
+    {
+        this.AudioSource = audioSource;
+    }
 }
 
 public class SoundManager : Singleton<SoundManager>
 {
-    Dictionary<string, AudioClip> sounds = new Dictionary<string, AudioClip>();
+    protected override bool IsDontDestroying => true;
+    private readonly Dictionary<string, AudioClip> sounds = new Dictionary<string, AudioClip>();
+    private readonly Dictionary<SoundType, AudioInfo> audioInfos = new Dictionary<SoundType, AudioInfo>();
 
-    Dictionary<SoundType, float> Volumes = new Dictionary<SoundType, float>()
+    protected override void OnCreated()
     {
-        { SoundType.SE, 1 },
-        { SoundType.BGM, 1 }
-    };
+        base.OnCreated();
+        AddAudioType(SoundType.Se, SaveManager.Instance.SaveData.sfxVolume);
+        AddAudioType(SoundType.BGM, SaveManager.Instance.SaveData.bgmVolume).loop = true;
 
-    Dictionary<SoundType, AudioSource> AudioSources = new Dictionary<SoundType, AudioSource>();
-
-    public override void OnReset()
-    {
+        AudioClip[] clips = Resources.LoadAll<AudioClip>("Sounds/");
+        foreach (AudioClip clip in clips)
+            sounds[clip.name] = clip;
     }
 
-    protected override void Awake()
+    private AudioSource AddAudioType(SoundType soundType, float volume)
     {
-        base.Awake();
-        if (Instance == this)
+        var audioObj = new GameObject(soundType.ToString());
+        audioObj.transform.parent = transform;
+
+        audioInfos[soundType] = new AudioInfo(audioObj.AddComponent<AudioSource>())
         {
-            GameObject Se = new GameObject("SE");
-            Se.transform.parent = transform;
-            Se.AddComponent<AudioSource>();
-            AudioSources[SoundType.SE] = Se.GetComponent<AudioSource>();
-            Volumes[SoundType.SE] = SaveManager.Instance.saveData.sfxVolume;
-            VolumeChange(SoundType.SE, SaveManager.Instance.saveData.sfxVolume);
-
-            GameObject Bgm = new GameObject("BGM");
-            Bgm.transform.parent = transform;
-            Bgm.AddComponent<AudioSource>().loop = true;
-            AudioSources[SoundType.BGM] = Bgm.GetComponent<AudioSource>();
-            VolumeChange(SoundType.BGM, SaveManager.Instance.saveData.bgmVolume);
-
-            AudioClip[] clips = Resources.LoadAll<AudioClip>("Sounds/");
-            foreach (AudioClip clip in clips)
-                sounds[clip.name] = clip;
-        }
+            volume = volume
+        };
+        return audioInfos[soundType].AudioSource;
     }
 
     public void VolumeChange(SoundType soundType, float volume)
     {
-        Volumes[soundType] = volume;
-        AudioSources[soundType].volume = Volumes[soundType];
+        audioInfos[soundType].volume = volume;
+        audioInfos[soundType].AudioSource.volume = volume;
         switch (soundType)
         {
-            case SoundType.SE:
-                SaveManager.Instance.saveData.sfxVolume = volume;
+            case SoundType.Se:
+                SaveManager.Instance.SaveData.sfxVolume = volume;
                 break;
             case SoundType.BGM:
-                SaveManager.Instance.saveData.bgmVolume = volume;
-                break;
-            case SoundType.END:
-            default:
+                SaveManager.Instance.SaveData.bgmVolume = volume;
                 break;
         }
     }
 
-    public void PlaySound(string clipName, SoundType ClipType = SoundType.SE, float Volume = 1, float Pitch = 1)
+    public void PlaySound(string clipName, SoundType soundType = SoundType.Se, float volume = 1, float pitch = 1)
     {
-        if (ClipType != SoundType.SE && ClipType != SoundType.END)
+        if (clipName == "")
         {
-            if (clipName == "")
-            {
-                AudioSources[ClipType].Stop();
-                return;
-            }
-
-            AudioSources[ClipType].clip = sounds[clipName];
-            AudioSources[ClipType].volume = Volumes[ClipType] * Volume;
-            AudioSources[ClipType].Play();
+            audioInfos[soundType].AudioSource.Stop();
+            return;
         }
-        else
+
+        audioInfos[soundType].AudioSource.pitch = pitch;
+        if (soundType == SoundType.BGM)
         {
-            if (clipName == "")
-            {
-                AudioSources[ClipType].Stop();
-                return;
-            }
-
-            AudioSources[ClipType].pitch = Pitch;
-            AudioSources[ClipType].PlayOneShot(sounds[clipName], Volume);
+            audioInfos[soundType].AudioSource.clip = sounds[clipName];
+            audioInfos[soundType].AudioSource.volume = audioInfos[soundType].volume * volume;
+            audioInfos[soundType].AudioSource.Play();
+            return;
         }
+
+        audioInfos[soundType].AudioSource.PlayOneShot(sounds[clipName], volume);
     }
 }

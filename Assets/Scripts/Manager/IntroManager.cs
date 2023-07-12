@@ -1,74 +1,81 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 public class IntroManager : MonoBehaviour
 {
-    [SerializeField] private Image[] backgrounds;
-    [SerializeField] private Image[] roads;
     [SerializeField] private Image car;
+    
 
-    [SerializeField] private TextMeshProUGUI textMeshProUGUI;
+    [BoxGroup("Scroll")]
+    [SerializeField] private Image[] backgrounds;
+    [BoxGroup("Scroll")]
+    [SerializeField] private Image[] roads;
+    
+    [Space(15)]
+    [FormerlySerializedAs("textMeshProUGUI")] 
+    [SerializeField] private TextMeshProUGUI dialogText;
 
-    private Vector2 vector;
-    public Image image;
+    [SerializeField] private Button skipButton;
+
+    private Vector2 carPos;
+
+    private void Awake()
+    {
+        carPos = car.rectTransform.anchoredPosition;
+        
+        skipButton.onClick.RemoveAllListeners();
+        skipButton.onClick.AddListener(GoToTitle);
+    }
 
     private void Start()
     {
-        vector = car.rectTransform.anchoredPosition;
-        image.gameObject.SetActive(false);
         StartCoroutine(Intro());
     }
 
-    IEnumerator FadeIn()
+    private IEnumerator Text(string text)
     {
-        image.gameObject.SetActive(true);
-        while (image.color.a < 1)
-        {
-            image.color = new Color(image.color.r, image.color.g, image.color.b, image.color.a + Time.deltaTime);
-            yield return null;
-        }
-        SceneManager.LoadScene("Title");
-    }
-
-    IEnumerator Text(string text)
-    {
-        textMeshProUGUI.text = "";
-        textMeshProUGUI.color = new Color(textMeshProUGUI.color.r, textMeshProUGUI.color.g, textMeshProUGUI.color.b, 1);
+        dialogText.text = "";
+        dialogText.color = new Color(dialogText.color.r, dialogText.color.g, dialogText.color.b, 1);
+        
+        var wait = new WaitForSeconds(0.05f);
         for (int i = 0; i < text.Length; i++)
         {
-            textMeshProUGUI.text = text.Substring(0, i+1);
-            yield return new WaitForSeconds(0.05f);
+            dialogText.text = text.Substring(0, i+1);
+            yield return wait;
         }
-        yield return new WaitForSeconds(0.5f);
-        while (textMeshProUGUI.color.a > 0)
+        wait = new WaitForSeconds(0.5f);
+        yield return wait;
+        while (dialogText.color.a > 0)
         {
-            textMeshProUGUI.color = new Color(textMeshProUGUI.color.r, textMeshProUGUI.color.g, textMeshProUGUI.color.b,
-                textMeshProUGUI.color.a - Time.deltaTime/2);
+            dialogText.color = new Color(dialogText.color.r, dialogText.color.g, dialogText.color.b,
+                dialogText.color.a - Time.deltaTime/2);
             yield return null;
         }
-        textMeshProUGUI.color = new Color(textMeshProUGUI.color.r, textMeshProUGUI.color.g, textMeshProUGUI.color.b, 0);
-        yield return new WaitForSeconds(0.5f);
+        dialogText.color = new Color(dialogText.color.r, dialogText.color.g, dialogText.color.b, 0);
+        yield return wait;
     }
 
-    IEnumerator Intro()
+    private IEnumerator Intro()
     {
         yield return StartCoroutine(Text("평화로웠을 대한민국,"));
         yield return StartCoroutine(Text("어느날 갑자기, 필기구들이 변하기 시작했다."));
         yield return StartCoroutine(Text("지우개와 같은 필기구들이 사람같이 되어, 사람을 공격하기 시작한 것이다."));
         yield return StartCoroutine(Text("이러한 현상을 막고자 모나미에선 사람이 된 볼펜들을 투입한다."));
         yield return StartCoroutine(Text("이건 그 이야기이다."));
-        GoTitle();
+        GoToTitle();
     }
 
-    public void GoTitle()
+    private void GoToTitle()
     {
-        StartCoroutine(FadeIn());
+        TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade, () =>
+        {
+            TransitionManager.Instance.LoadScene(SceneType.Title);
+            TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade);
+        });
     }
 
     private void Update()
@@ -95,6 +102,6 @@ public class IntroManager : MonoBehaviour
             }
         }
 
-        car.rectTransform.anchoredPosition = vector + Random.insideUnitCircle * 2.5f;
+        car.rectTransform.anchoredPosition = carPos + Random.insideUnitCircle * 2.5f;
     }
 }

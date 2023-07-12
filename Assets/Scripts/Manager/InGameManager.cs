@@ -7,14 +7,14 @@ using UnityEngine.Serialization;
 
 public class InGameManager : Singleton<InGameManager>
 {
-    [HideInInspector] public List<Enemy> inCameraEnemies = new List<Enemy>();
-    private Vector3 cameraDistance = new Vector3(0, 0, 100);
+    private readonly Vector3 cameraDistance = new Vector3(0, 0, 100);
 
     public Vector2 minPos;
     public Vector2 maxPos;
 
     public bool isGaming;
-    public float timer { get; private set; }
+    
+    private float timer;
     public int killEnemyCount;
 
     #region 보스 관련 변수
@@ -29,12 +29,9 @@ public class InGameManager : Singleton<InGameManager>
     [SerializeField] private Enemy enemyBase;
     public ParticleSystem enemyKillEffect;
 
-    private float enemyKillEffectDuration = 2;
-
     private float enemyCooltime = 0.5f;
     private float enemyDuration = 0;
     private float enemyPower = 0;
-
 
     public Material flashWhiteMaterial;
 
@@ -42,19 +39,19 @@ public class InGameManager : Singleton<InGameManager>
 
     #region 레벨 변수
 
-    [SerializeField] private GameObject exp;
-    private float expRandomMin = 0.5f;
-    private float expRandomMax = 1.5f;
+    [FormerlySerializedAs("exp")] [SerializeField] private GameObject expObj;
+    private readonly float expRandomMin = 0.5f;
+    private readonly float expRandomMax = 1.5f;
 
     #endregion
 
     #region 움직이는 텍스트 변수
 
     [SerializeField] private GameObject damageText;
-    private float fadeInTime = 0.2f;
-    private float fadeOutTime = 0.5f;
-    private float moveXPos = 0.7f;
-    private float moveYPos = 1f;
+    private readonly float fadeInTime = 0.2f;
+    private readonly float fadeOutTime = 0.5f;
+    private readonly float moveXPos = 0.7f;
+    private readonly float moveYPos = 1f;
 
     #endregion
 
@@ -63,15 +60,9 @@ public class InGameManager : Singleton<InGameManager>
     [SerializeField] private Boss[] stageBoss;
     [SerializeField] private SpriteRenderer carImage;
 
-    public int Score
-    {
-        get
-        {
-            return Mathf.RoundToInt(killEnemyCount + (stage - 1) * 1000 + (60 - timer));
-        }
-    }
+    public int Score => Mathf.RoundToInt(killEnemyCount + (stage - 1) * 1000 + (60 - timer));
 
-    public override void OnReset()
+    protected override void OnCreated()
     {
         isGaming = false;
 
@@ -84,10 +75,10 @@ public class InGameManager : Singleton<InGameManager>
         MapSetting();
     }
 
-    IEnumerator CarIntro()
+    private IEnumerator CarIntro()
     {
         Player.Instance.transform.position = Vector3.zero;
-        Camera.main.transform.position = Vector3.zero - cameraDistance;
+        GameManager.Instance.MainCamera.transform.position = Vector3.zero - cameraDistance;
         
         carImage.gameObject.SetActive(true);
         carImage.transform.position = new Vector3(16, 0, 0);
@@ -95,7 +86,6 @@ public class InGameManager : Singleton<InGameManager>
 
         yield return new WaitForSeconds(3);
 
-        SingletonCanvas.Instance.gameObject.SetActive(true);
         Player.Instance.gameObject.SetActive(true);
 
         isGaming = true;
@@ -166,7 +156,7 @@ public class InGameManager : Singleton<InGameManager>
         SoundManager.Instance.PlaySound("boss", SoundType.BGM);
         SoundManager.Instance.PlaySound("warning");
 
-        GameObject bossObj = PoolManager.Instance.Init(stageBoss[stage - 1].gameObject);
+        GameObject bossObj = PoolManager.Instance.Init("Boss" + stage);
         bossObj.transform.position = Player.Instance.transform.position + (Vector3)Random.insideUnitCircle.normalized * 20;
 
         switch (stage)
@@ -200,27 +190,29 @@ public class InGameManager : Singleton<InGameManager>
         UIManager.Instance.GameOver();
     }
 
-    public void Exit()
+    public void GoToTitle()
     {
-        foreach (var stageBackground in stageBackgrounds)
-            stageBackground.gameObject.SetActive(false);
+        DOTween.KillAll();
+        Cursor.visible = true;
+        Time.timeScale = 1;
+        PoolManager.Instance.DisableAllObjects();
+        
+        TransitionManager.Instance.LoadScene(SceneType.Title);
+        
+        TransitionManager.Instance.TransitionFadeOut();
     }
 
     public void OnKill(Enemy enemy)
     {
         killEnemyCount++;
-        inCameraEnemies.Remove(enemy);
 
-        CreateExp(enemy);
+        var exp = PoolManager.Instance.Init("Exp").GetComponent<Exp>();
 
-        GameObject effectObj = PoolManager.Instance.Init(enemyKillEffect.gameObject);
+        exp.transform.position = enemy.transform.position;
+        exp.exp = (Random.Range(expRandomMin, expRandomMax) * enemy.stat.maxHp + enemy.stat.damage) * 1.3f;
+
+        var effectObj = PoolManager.Instance.Init("Enemy Kill Effect");
         effectObj.transform.position = enemy.transform.position;
-
-        AutoDestruct autoDestruct = effectObj.GetComponent<AutoDestruct>();
-        if (autoDestruct == null)
-            autoDestruct = effectObj.AddComponent<AutoDestruct>();
-
-        autoDestruct.duration = enemyKillEffectDuration;
     }
 
     private void Update()
@@ -236,7 +228,7 @@ public class InGameManager : Singleton<InGameManager>
     private void CameraMove()
     {
         Vector3 pos = Player.Instance.transform.position - cameraDistance;
-        Camera.main.transform.position = new Vector3(Mathf.Clamp(pos.x, -29.7675f, 29.7675f), Mathf.Clamp(pos.y, -24.75f, 24.75f), pos.z);
+        GameManager.Instance.MainCamera.transform.position = new Vector3(Mathf.Clamp(pos.x, -29.7675f, 29.7675f), Mathf.Clamp(pos.y, -24.75f, 24.75f), pos.z);
     }
 
     public Vector3 GetPosInMap(Vector3 vector, float radius)
@@ -251,7 +243,7 @@ public class InGameManager : Singleton<InGameManager>
         {
             enemyDuration -= enemyCooltime;
             enemyPower++;
-            GameObject obj = PoolManager.Instance.Init(enemyBase.gameObject);
+            GameObject obj = PoolManager.Instance.Init("Enemy");
             obj.transform.position = Player.Instance.transform.position + (Vector3)Random.insideUnitCircle.normalized * 15;
             Enemy enemy = obj.GetComponent<Enemy>();
             enemy.stat.damage = 5 + 0.01f * enemyPower/2;
@@ -264,17 +256,17 @@ public class InGameManager : Singleton<InGameManager>
 
     public void AddWeapon()
     {
-        List<Item> chooseItems = new List<Item>();
-        List<Item> itemList = new List<Item>();
-        List<Item> upgradeItemList = Player.Instance.GetInven().FindAll((Item x) => x.CanGet());
-        foreach (Item item in ResourcesManager.Instance.items.Values)
+        var chooseItems = new List<Item>();
+        var itemList = new List<Item>();
+        List<Item> upgradeItemList = Player.Instance.GetInven().FindAll(item => item.CanGet());
+        foreach (Item item in ResourcesManager.Instance.GetAllItems())
             if (item.CanGet())
                 itemList.Add(item);
 
         int itemCount = 3;
         if (upgradeItemList.Count > 0)
         {
-            Item addItem = RandomManager.SelectOne(upgradeItemList);
+            Item addItem = upgradeItemList.SelectOne();
             chooseItems.Add(addItem);
             itemList.Remove(addItem);
             itemCount--;
@@ -288,27 +280,12 @@ public class InGameManager : Singleton<InGameManager>
                 return;
             }
 
-            Item addItem = RandomManager.SelectOne(itemList);
+            Item addItem = itemList.SelectOne();
             chooseItems.Add(addItem);
             itemList.Remove(addItem);
         }
-
-
+        
         UIManager.Instance.StartChooseItem(chooseItems);
-    }
-
-    #endregion
-
-    #region 레벨 함수
-
-    public void CreateExp(Enemy enemy)
-    {
-        GameObject expObj = PoolManager.Instance.Init(this.exp);
-        Exp exp = expObj.GetComponent<Exp>();
-
-        expObj.transform.position = enemy.transform.position;
-
-        exp.exp = (Random.Range(expRandomMin, expRandomMax) * enemy.stat.maxHp + enemy.stat.damage) * 1.3f;
     }
 
     #endregion
@@ -317,7 +294,7 @@ public class InGameManager : Singleton<InGameManager>
 
     public void ShowText(string text, Vector3 pos, Color color)
     {
-        GameObject damageTextObj = PoolManager.Instance.Init(damageText);
+        GameObject damageTextObj = PoolManager.Instance.Init("DamageText");
         TextMeshPro textMesh = damageTextObj.GetComponent<TextMeshPro>();
 
         textMesh.text = text;
@@ -340,7 +317,7 @@ public class InGameManager : Singleton<InGameManager>
 
     public void NextStage()
     {
-        PoolManager.Instance.GameEnd();
+        PoolManager.Instance.DisableAllObjects();
         UIManager.Instance.NextStageSetting();
         stage++;
 

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1827119289244358599}
   - component: {fileID: 8812147797389166519}
   - component: {fileID: 7196304905748731964}
+  - component: {fileID: 9021037143628708428}
   m_Layer: 0
   m_Name: Kill Effect
   m_TagString: Untagged
@@ -4862,3 +4863,16 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &9021037143628708428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2625452260488709129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b614dde6e3384bf4f815b70b9f600061, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duration: 2

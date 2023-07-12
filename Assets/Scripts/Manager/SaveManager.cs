@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Playables;
 
 [System.Serializable]
 public class SaveData
@@ -12,14 +9,15 @@ public class SaveData
 
 public class SaveManager : Singleton<SaveManager>
 {
-    SaveData _saveData;
-    public SaveData saveData
+    protected override bool IsDontDestroying => true;
+    private SaveData saveData;
+    public SaveData SaveData
     {
         get
         {
-            if (_saveData == null)
+            if (saveData == null)
                 LoadGameData();
-            return _saveData;
+            return saveData;
         }
     }
 
@@ -27,7 +25,7 @@ public class SaveManager : Singleton<SaveManager>
     {
         SaveGameData();
     }
-    public override void OnReset()
+    protected override void OnCreated()
     {
         LoadGameData();
     }
@@ -35,14 +33,11 @@ public class SaveManager : Singleton<SaveManager>
     private void LoadGameData()
     {
         string s = PlayerPrefs.GetString("SaveData", "none");
-        if (s == "none")
-            _saveData = new SaveData();
-        else
-            _saveData = JsonUtility.FromJson<SaveData>(s);
+        saveData = s == "none" ? new SaveData() : JsonUtility.FromJson<SaveData>(s);
     }
 
     private void SaveGameData()
     {
-        PlayerPrefs.SetString("SaveData", JsonUtility.ToJson(saveData));
+        PlayerPrefs.SetString("SaveData", JsonUtility.ToJson(SaveData));
     }
 }

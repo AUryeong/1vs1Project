@@ -1,17 +1,11 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
-using TMPro;
-using UnityEngine.Serialization;
 
 public class TitleManager : MonoBehaviour
 {
-    [SerializeField] protected Image black;
-
     [Space(10f)] 
     [SerializeField] protected Image title;
     
@@ -31,40 +25,24 @@ public class TitleManager : MonoBehaviour
 
     private void Awake()
     {
-        Camera.main.transform.position = new Vector3(0, 0, -10);
-
-        black.gameObject.SetActive(false);
-        TransitionManager.Instance.blackBackground.gameObject.SetActive(false);
+        GameManager.Instance.MainCamera.transform.position = new Vector3(0, 0, -10);
 
         bgmSlider.onValueChanged.RemoveAllListeners();
-        bgmSlider.value = SaveManager.Instance.saveData.bgmVolume;
+        bgmSlider.value = SaveManager.Instance.SaveData.bgmVolume;
         bgmSlider.onValueChanged.AddListener((value)=>
         {
           SoundManager.Instance.VolumeChange(SoundType.BGM, value);  
         });
 
         sfxSlider.onValueChanged.RemoveAllListeners();
-        sfxSlider.value = SaveManager.Instance.saveData.sfxVolume;
+        sfxSlider.value = SaveManager.Instance.SaveData.sfxVolume;
         sfxSlider.onValueChanged.AddListener((value)=>
         {
-            SoundManager.Instance.VolumeChange(SoundType.SE, value);  
+            SoundManager.Instance.VolumeChange(SoundType.Se, value);  
         });
         
+        TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade);
         SoundManager.Instance.PlaySound("title", SoundType.BGM);
-        StartCoroutine(FadeOut());
-    }
-
-
-    IEnumerator FadeOut()
-    {
-        black.gameObject.SetActive(true);
-        while (black.color.a > 0)
-        {
-            black.color = new Color(black.color.r, black.color.g, black.color.b, black.color.a - Time.deltaTime);
-            yield return null;
-        }
-
-        black.gameObject.SetActive(false);
     }
 
     public void GameStart()

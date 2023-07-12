@@ -1,34 +1,29 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ResourcesManager : Singleton<ResourcesManager>
 {
-
-    private bool isWritingResources = false;
-    private Dictionary<string, GameObject> projectiles = new Dictionary<string, GameObject>();
-    private Dictionary<string, Sprite> itemIcons = new Dictionary<string, Sprite>();
-    public Dictionary<string, Item> items = new Dictionary<string, Item>();
-    public override void OnReset()
+    protected override bool IsDontDestroying => true;
+    
+    private readonly Dictionary<string, Item> items = new Dictionary<string, Item>();
+    protected override void OnCreated()
     {
-        if (!isWritingResources)
-            ReadResource();
-        else
-            foreach (Item item in items.Values)
-                item.OnReset();
+        ReadResource();
     }
 
-    public void ReadResource()
+    protected override void OnReset()
     {
-        foreach (var projectile in Resources.LoadAll<GameObject>("Projectile"))
-            projectiles.Add(projectile.name, projectile);
+        foreach (Item item in items.Values)
+            item.OnReset();
+    }
 
-        foreach (var icon in Resources.LoadAll<Sprite>("Item/Icon"))
-            itemIcons.Add(icon.name, icon);
+    private void ReadResource()
+    {
+        foreach (var projectile in Resources.LoadAll<GameObject>(nameof(Projectile)))
+            PoolManager.Instance.AddPoolData(projectile.name, projectile);
 
         ReadItem();
-
-        isWritingResources = true;
     }
 
     private void ReadItem()
@@ -46,6 +41,12 @@ public class ResourcesManager : Singleton<ResourcesManager>
             // 아이템 생성
             Item item = System.Activator.CreateInstance(System.Type.GetType("Item_" + codeItemName)) as Item;
 
+            if (item == null)
+            {
+                Debug.LogAssertion("Projectile not found : " + codeItemName + ", " + itemName);
+                return;
+            }
+            
             List<string> lore = new List<string>();
             // 2를 뺀 이유는 앞 2칸은 코드 아이템 이름, 아이템 이름이기 때문
             for (int i = 0; i < texts.Length - 2; i++)
@@ -61,13 +62,18 @@ public class ResourcesManager : Singleton<ResourcesManager>
         }
     }
 
-    public GameObject GetProjectile(string projectileName)
+    public Item GetItem(string itemName)
     {
-        if (!projectiles.ContainsKey(projectileName))
+        if (!items.ContainsKey(itemName))
         {
-            Debug.LogAssertion("Projectile not found : " + projectileName);
+            Debug.LogAssertion("Item not found : " + itemName);
             return null;
         }
-        return PoolManager.Instance.Init(projectiles[projectileName]);
+        return items[itemName];
+    }
+
+    public List<Item> GetAllItems()
+    {
+        return items.Values.ToList();
     }
 }

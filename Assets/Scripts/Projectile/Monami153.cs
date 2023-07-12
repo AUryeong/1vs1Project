@@ -1,19 +1,18 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
 public class Monami153 : Projectile
 {
-    float downDuration = 0.5f;
-    float downWaitDuration = 3;
-    float downFadeOutDuration = 1;
+    private readonly float duration = 3;
+    private readonly float fadeOutDuration = 1;
+    private readonly float shootSpeed = 25f;
 
-    private bool isPenetrating = false;
+    private bool isPenetrating;
 
-    SpriteRenderer spriteRenderer;
+    private SpriteRenderer spriteRenderer;
 
-    void Awake()
+    private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
@@ -42,18 +41,18 @@ public class Monami153 : Projectile
         transform.rotation = Quaternion.Euler(0,0,angle+180);
 
         transform.localScale = size;
-        StartCoroutine(OnDownCoroutine());
+        StartCoroutine(OnDisableCoroutine());
     }
 
-    void Update()
+    private void Update()
     {
-        transform.Translate(Vector2.left * (Time.deltaTime * 25));
+        transform.Translate(Vector3.left * (Time.deltaTime * shootSpeed));
     }
-    IEnumerator OnDownCoroutine()
+    private IEnumerator OnDisableCoroutine()
     {
-        yield return new WaitForSeconds(downWaitDuration);
+        yield return new WaitForSeconds(duration);
         
-        spriteRenderer.DOFade(0, downFadeOutDuration).SetEase(Ease.InQuint).
+        spriteRenderer.DOFade(0, fadeOutDuration).SetEase(Ease.InQuint).
             OnComplete(() => gameObject.SetActive(false));
     }
 }

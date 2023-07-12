@@ -29,7 +29,7 @@ public class Exp : MonoBehaviour
             if (Vector3.Distance(transform.position, Player.Instance.transform.position) < gettingDistance)
             {
                 gameObject.SetActive(false);
-                SoundManager.Instance.PlaySound("exp", SoundType.SE, 2f, 2f);
+                SoundManager.Instance.PlaySound("exp", SoundType.Se, 2f, 2f);
                 Player.Instance.Exp += exp;
             }
         }
