@@ -87,8 +87,6 @@ public class Item
 public class Item_Monami153 : Item
 {
     private float duration;
-    readonly private float randomDistance = 4;
-
 
     readonly private float defaultDamagePercent = 0.6f;
 

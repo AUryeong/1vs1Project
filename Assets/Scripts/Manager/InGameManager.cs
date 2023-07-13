@@ -64,15 +64,14 @@ public class InGameManager : Singleton<InGameManager>
 
     protected override void OnCreated()
     {
-        isGaming = false;
-
-        TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade, () => StartCoroutine(CarIntro()));
-
         stage = 1;
         timer = 60;
         killEnemyCount = 0;
 
         MapSetting();
+        Player.Instance.gameObject.SetActive(false);
+
+        TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade, () => StartCoroutine(CarIntro()));
     }
 
     private IEnumerator CarIntro()
@@ -228,7 +227,7 @@ public class InGameManager : Singleton<InGameManager>
     private void CameraMove()
     {
         Vector3 pos = Player.Instance.transform.position - cameraDistance;
-        GameManager.Instance.MainCamera.transform.position = new Vector3(Mathf.Clamp(pos.x, -29.7675f, 29.7675f), Mathf.Clamp(pos.y, -24.75f, 24.75f), pos.z);
+        GameManager.Instance.MainCamera.transform.position = new Vector3(Mathf.Clamp(pos.x, minPos.x*0.698f, maxPos.x * 0.698f), Mathf.Clamp(pos.y, minPos.y * 0.773f, maxPos.y * 0.773f), pos.z);
     }
 
     public Vector3 GetPosInMap(Vector3 vector, float radius)

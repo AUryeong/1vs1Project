@@ -22,7 +22,7 @@ public class TransitionManager : Singleton<TransitionManager>
 {
     protected override bool IsDontDestroying => true;
 
-    [Header("화면 연출")] 
+    [Header("화면 연출")]
     private bool isSceneFadeInTransitioning = false;
     private bool isSceneFadeOutTransitioning = false;
 
@@ -31,11 +31,20 @@ public class TransitionManager : Singleton<TransitionManager>
 
     public Image blackBackground;
 
+    private Coroutine fadeOutCoroutine;
+    private Coroutine fadeInCoroutine;
+
     protected override void OnCreated()
     {
         background.gameObject.SetActive(false);
         transitionSquare.gameObject.SetActive(false);
-        
+
+        isSceneFadeInTransitioning = false;
+        isSceneFadeOutTransitioning = false;
+    }
+
+    protected override void OnReset()
+    {
         isSceneFadeInTransitioning = false;
         isSceneFadeOutTransitioning = false;
     }
@@ -45,11 +54,21 @@ public class TransitionManager : Singleton<TransitionManager>
         SceneManager.LoadScene((int)sceneType);
     }
 
+    private void StopCoroutine()
+    {
+        if (fadeInCoroutine != null)
+            StopCoroutine(fadeInCoroutine);
+
+        if (fadeOutCoroutine != null)
+            StopCoroutine(fadeOutCoroutine);
+    }
+
     public void TransitionFadeIn(TransitionType type = TransitionType.Square, Action action = null)
     {
         if (type == TransitionType.Fade)
         {
-            StartCoroutine(FadeIn(action));
+            StopCoroutine();
+            fadeInCoroutine = StartCoroutine(FadeIn(action));
             return;
         }
 
@@ -57,10 +76,10 @@ public class TransitionManager : Singleton<TransitionManager>
 
         isSceneFadeInTransitioning = true;
         transitionSquare.transform.DOKill(true);
-        
+
         background.gameObject.SetActive(true);
         transitionSquare.gameObject.SetActive(true);
-        
+
         transitionSquare.transform.localScale = Vector3.one * 30;
         transitionSquare.transform.DOScale(Vector3.zero, 1).SetEase(Ease.InQuad).OnComplete(() =>
         {
@@ -74,7 +93,8 @@ public class TransitionManager : Singleton<TransitionManager>
     {
         if (type == TransitionType.Fade)
         {
-            StartCoroutine(FadeOut(action));
+            StopCoroutine();
+            fadeOutCoroutine = StartCoroutine(FadeOut(action));
             return;
         }
 
@@ -82,7 +102,7 @@ public class TransitionManager : Singleton<TransitionManager>
 
         isSceneFadeOutTransitioning = true;
         transitionSquare.transform.DOKill(true);
-        
+
         background.gameObject.SetActive(true);
         transitionSquare.gameObject.SetActive(true);
 
@@ -101,26 +121,25 @@ public class TransitionManager : Singleton<TransitionManager>
     IEnumerator FadeIn(Action action = null)
     {
         blackBackground.gameObject.SetActive(true);
-        blackBackground.color = new Color(blackBackground.color.r, blackBackground.color.g, blackBackground.color.b, 1);
+        blackBackground.color = blackBackground.color.FadeChange(1);
         while (blackBackground.color.a > 0)
         {
-            blackBackground.color = new Color(blackBackground.color.r, blackBackground.color.g, blackBackground.color.b,
-                blackBackground.color.a - Time.unscaledDeltaTime / 2);
+            blackBackground.color = blackBackground.color.FadeChange(blackBackground.color.a - Time.unscaledDeltaTime / 2);
             yield return null;
         }
 
         blackBackground.gameObject.SetActive(false);
+
         action?.Invoke();
     }
 
     IEnumerator FadeOut(Action action = null)
     {
         blackBackground.gameObject.SetActive(true);
-        blackBackground.color = new Color(blackBackground.color.r, blackBackground.color.g, blackBackground.color.b, 0);
+        blackBackground.color = blackBackground.color.FadeChange(0);
         while (blackBackground.color.a < 1)
         {
-            blackBackground.color = new Color(blackBackground.color.r, blackBackground.color.g, blackBackground.color.b,
-                blackBackground.color.a + Time.unscaledDeltaTime / 2);
+            blackBackground.color = blackBackground.color.FadeChange(blackBackground.color.a + Time.unscaledDeltaTime / 2);
             yield return null;
         }
 

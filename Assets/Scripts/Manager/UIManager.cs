@@ -91,8 +91,6 @@ public class UIManager : Singleton<UIManager>
         TransitionManager.Instance.background.gameObject.SetActive(false);
         TransitionManager.Instance.transitionSquare.gameObject.SetActive(false);
 
-        Player.Instance.gameObject.SetActive(false);
-
         Cursor.visible = false;
 
         UpdateLevel();
