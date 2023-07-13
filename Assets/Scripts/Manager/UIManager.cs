@@ -9,12 +9,8 @@ public class UIManager : Singleton<UIManager>
 {
     [SerializeField] private Image mouseCursor;
 
-    #region 프로필 변수
-
     [Header("프로필 변수")] [SerializeField] private Image hpBar;
     [SerializeField] private TextMeshProUGUI scoreText;
-
-    #endregion
 
     [Header("게임 오버 변수")]
     [SerializeField] private Image gameOverWindow;
@@ -26,28 +22,16 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private TextMeshProUGUI gameWinText;
     [SerializeField] private Button gameWinButton;
 
-    #region 무기 획득 변수
-
     [Header("무기 획득 변수")] 
     [SerializeField] private GameObject levelUpUI;
     [SerializeField] private ItemSlot[] itemSlots;
 
     private bool itemSlotActivating;
 
-    #endregion
-
-    #region 타이머 변수
-
     [Header("타이머 변수")] [SerializeField] private TextMeshProUGUI timerText;
-
-    #endregion
-
-    #region 레벨 변수
 
     [Header("레벨 변수")] [SerializeField] private Image lvBarImage;
     [SerializeField] private TextMeshProUGUI lvBarText;
-
-    #endregion
 
     [Header("보스 변수")] 
     [SerializeField] private Image bossBar;
@@ -131,14 +115,16 @@ public class UIManager : Singleton<UIManager>
 
     private void Update()
     {
-        var vector = Input.mousePosition;
-        mouseCursor.rectTransform.anchoredPosition = new Vector2(vector.x, vector.y);
-        if (!InGameManager.Instance.isGaming)
-        {
-            return;
-        }
+        MouseUpdate();
+        if (!InGameManager.Instance.isGaming) return;
 
         ScoreUpdate();
+    }
+
+    private void MouseUpdate()
+    {
+        var vector = Input.mousePosition;
+        mouseCursor.rectTransform.anchoredPosition = new Vector2(vector.x, vector.y);
     }
 
     private void ScoreUpdate()
@@ -185,8 +171,6 @@ public class UIManager : Singleton<UIManager>
         gameWinText.text = $"획득한 점수 : {InGameManager.Instance.Score}";
     }
 
-    #region 게임 오버 함수
-
     public void GameOver()
     {
         gameOverWindow.gameObject.SetActive(true);
@@ -201,30 +185,25 @@ public class UIManager : Singleton<UIManager>
             InGameManager.Instance.GoToTitle();
         });
     }
-
-    #endregion
-
-    #region 무기 획득 함수
-
     public void StartChooseItem(List<Item> items)
     {
         itemSlotActivating = true;
-        SoundManager.Instance.PlaySound("level up");
+        SoundManager.Instance.PlaySound("level up", SoundType.Se , 0.8f);
         levelUpUI.gameObject.SetActive(true);
         Time.timeScale = 0;
 
         for (int i = 0; i < items.Count; i++)
         {
-            var a = itemSlots[i];
-            a.item = items[i];
-            a.GetComponent<Button>().onClick.AddListener(() => EndChooseItem(a));
+            var itemSlot = itemSlots[i];
+            itemSlot.Item = items[i];
+            itemSlot.Button.onClick.AddListener(() => EndChooseItem(itemSlot));
         }
 
         foreach (var itemSLot in itemSlots)
             itemSLot.SlotSelect();
 
         foreach (ItemSlot itemSlot in itemSlots)
-            itemSlot.rectTransform.anchoredPosition = Vector2.zero;
+            itemSlot.RectTransform.anchoredPosition = Vector2.zero;
     }
 
     private void EndChooseItem(ItemSlot chooseItemSlot)
@@ -232,36 +211,25 @@ public class UIManager : Singleton<UIManager>
         if (!itemSlotActivating) return;
         
         itemSlotActivating = false;
-        SoundManager.Instance.PlaySound("item get");
+        SoundManager.Instance.PlaySound("item get", SoundType.Se , 0.6f);
 
-        Player.Instance.AddItem(chooseItemSlot.item);
+        Player.Instance.AddItem(chooseItemSlot.Item);
 
         levelUpUI.gameObject.SetActive(false);
         Time.timeScale = 1;
     }
-
-    #endregion
-
-    #region 타이머 함수
-
     public void UpdateTimer(float timer)
     {
         int timerInt = Mathf.CeilToInt(timer);
-        if (InGameManager.Instance.isBossSummon || InGameManager.Instance.stage == 1)
+        if (InGameManager.Instance.isBossSummon)
             timerText.text = "이동까지 " + (timerInt / 60).ToString("D2") + " : " + (timerInt % 60).ToString("D2");
         else
             timerText.text = "보스 출현까지 " + (timerInt / 60).ToString("D2") + " : " + (timerInt % 60).ToString("D2");
     }
-
-    #endregion
-
-    #region 레벨 함수
 
     public void UpdateLevel()
     {
         lvBarImage.DOFillAmount(Player.Instance.Exp / Player.Instance.maxExp, 0.3f).SetUpdate(true);
         lvBarText.text = "LV: " + Player.Instance.lv;
     }
-
-    #endregion
 }

@@ -1,43 +1,48 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Exp : MonoBehaviour
 {
     public float exp = 0;
     private bool isGot = false;
-    private float gettingSpeed = 6;
-    private float gettingDistance = 0.7f;
+    private float duration;
+
+    private const float getDuration = 0.75f;
+    
+    private Vector3 startPos;
+    private Vector3 middlePos;
 
     private void OnEnable()
     {
         isGot = false;
+        duration = 0;
     }
 
     private void Update()
     {
-        float deltaTime = Time.deltaTime;
-        Move(deltaTime);
+        Move();
     }
 
-    private void Move(float deltaTime)
+    private void Move()
     {
-        if (isGot)
-        {
-            transform.Translate(deltaTime * gettingSpeed * (Player.Instance.transform.position - transform.position).normalized);
+        if (!isGot) return;
 
-            if (Vector3.Distance(transform.position, Player.Instance.transform.position) < gettingDistance)
-            {
-                gameObject.SetActive(false);
-                SoundManager.Instance.PlaySound("exp", SoundType.Se, 2f, 2f);
-                Player.Instance.Exp += exp;
-            }
-        }
+        duration += Time.deltaTime;
+        transform.position = Utility.Beizer(startPos, middlePos, Player.Instance.transform.position, duration / getDuration);
+        
+        if (!(duration >= getDuration)) return;
+        
+        gameObject.SetActive(false);
+        SoundManager.Instance.PlaySound("exp", SoundType.Se, 2f, 2f);
+        Player.Instance.Exp += exp;
     }
 
     public void OnGet()
     {
-        if (!isGot)
-            isGot = true;
+        if (isGot) return;
+        
+        isGot = true;
+            
+        startPos = transform.position;
+        middlePos = startPos + (Vector3)Random.insideUnitCircle * Random.Range(1, 4.5f);
     }
 }

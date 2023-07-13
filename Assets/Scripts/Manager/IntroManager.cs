@@ -2,13 +2,11 @@ using System.Collections;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class IntroManager : MonoBehaviour
 {
     [SerializeField] private Image car;
-    
 
     [BoxGroup("Scroll")]
     [SerializeField] private Image[] backgrounds;
@@ -16,7 +14,6 @@ public class IntroManager : MonoBehaviour
     [SerializeField] private Image[] roads;
     
     [Space(15)]
-    [FormerlySerializedAs("textMeshProUGUI")] 
     [SerializeField] private TextMeshProUGUI dialogText;
 
     [SerializeField] private Button skipButton;

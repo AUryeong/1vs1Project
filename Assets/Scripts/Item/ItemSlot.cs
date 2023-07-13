@@ -1,51 +1,52 @@
-    using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using DG.Tweening;
 
 public class ItemSlot : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI itemName;
-    [SerializeField] TextMeshProUGUI itemLore;
-    Image slotImage;
-    public RectTransform rectTransform
+    [SerializeField] private TextMeshProUGUI itemName;
+    [SerializeField] private TextMeshProUGUI itemLore;
+    public RectTransform RectTransform
     {
         get;
         private set;
     }
-    private Item _item;
-    public Item item
+    private Item item;
+    public Item Item
     {
         get
         {
-            return _item;
+            return item;
         }
         set
         {
-            _item = value;
-            itemName.text = "[ " + _item.GetName() + " ]";
-            itemLore.text = _item.GetLore();
+            item = value;
+            itemName.text = "[ " + item.GetName() + " ]";
+            itemLore.text = item.GetLore();
         }
     }
-    private float selectMovePosX = -100;
-    private float deselectMovePosX = 0;
+    public Button Button
+    {
+        get;
+        private set;
+    }
+    private readonly float selectMovePosX = -100;
+    private readonly float deselectMovePosX = 0;
 
     protected void Awake()
     {
-        slotImage = GetComponent<Image>();
-        rectTransform = GetComponent<RectTransform>();
+        RectTransform = GetComponent<RectTransform>();
+        Button = GetComponent<Button>();
     }
 
     public void SlotSelect()
     {
-        rectTransform.DOAnchorPosX(selectMovePosX, 0.3f).SetUpdate(true);
+        RectTransform.DOAnchorPosX(selectMovePosX, 0.3f).SetUpdate(true);
     }
 
     public void SlotDeselect()
     {
-        rectTransform.DOAnchorPosX(deselectMovePosX, 0.3f).SetUpdate(true);
+        RectTransform.DOAnchorPosX(deselectMovePosX, 0.3f).SetUpdate(true);
     }
 }

@@ -4,7 +4,19 @@ using DG.Tweening;
 
 public class Player : Unit
 {
-    public static Player Instance;
+    public static Player Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = InGameManager.Instance.CreatePlayer();
+            }
+
+            return instance;
+        }
+    }
+    private static Player instance;
 
     //캐릭터 기본 스텟, 일반 stat은 퍼센트로 표현
     public Stat defaultStat;
@@ -19,10 +31,7 @@ public class Player : Unit
 
     public float Exp
     {
-        get
-        {
-            return exp;
-        }
+        get => exp;
         set
         {
             exp = value * xpAdd / 100;
@@ -58,11 +67,11 @@ public class Player : Unit
 
     #region 애니메이션 변수
 
-    [SerializeField] private SpriteRenderer gun;
+    [SerializeField] protected SpriteRenderer gun;
 
-    private SpriteRenderer spriteRenderer;
-    private Animator animator;
-    private Rigidbody2D rigid;
+    protected SpriteRenderer spriteRenderer;
+    protected Animator animator;
+    protected Rigidbody2D rigid;
     
     private readonly float animatorScaleSpeed = 0.2f;
     private static readonly int isWalkingHash = Animator.StringToHash("isWalking");
@@ -72,7 +81,6 @@ public class Player : Unit
 
     protected virtual void Awake()
     {
-        Instance = this;
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         rigid = GetComponent<Rigidbody2D>();
@@ -124,11 +132,9 @@ public class Player : Unit
 
     public void OnKill(Enemy enemy)
     {
-        foreach (Item item in items)
+        foreach (var item in items)
             item.OnKill(enemy);
     }
-
-    #region 인벤 함수
 
     public List<Item> GetInven()
     {
@@ -137,7 +143,7 @@ public class Player : Unit
 
     public void AddItem(Item addItem)
     {
-        Item item = items.Find(item => item == addItem);
+        var item = items.Find(item => item == addItem);
         if (item == null)
         {
             item = addItem;
@@ -148,22 +154,14 @@ public class Player : Unit
             item.OnUpgrade();
     }
 
-    #endregion
-
-    #region 총 함수
-
-    private void ShootUpdate()
+    protected virtual void ShootUpdate()
     {
         if (Input.GetMouseButton(0))
             foreach (var item in items)
                 item.OnShoot();
     }
 
-    #endregion
-
-    #region 몹 충돌 함수
-
-    private void Die()
+    protected virtual void Die()
     {
         InGameManager.Instance.GameOver();
     }
@@ -262,10 +260,6 @@ public class Player : Unit
         }
     }
 
-    #endregion
-
-    #region 이동 함수
-
     private void Move()
     {
         float speedX = 0;
@@ -311,6 +305,4 @@ public class Player : Unit
         transform.position = InGameManager.Instance.GetPosInMap(transform.position, 1);
         transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.y);
     }
-
-    #endregion
 }

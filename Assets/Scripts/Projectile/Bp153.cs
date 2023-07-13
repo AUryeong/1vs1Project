@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 
-public class Monami153 : Projectile
+public class Bp153 : Projectile
 {
     private readonly float duration = 3;
     private readonly float fadeOutDuration = 1;
@@ -19,7 +19,7 @@ public class Monami153 : Projectile
 
     public override void OnHit(Enemy enemy)
     {
-        if (item.upgrade >= 8)
+        if (item.Upgrade >= 8)
         {
             if (isPenetrating)
                 gameObject.SetActive(false);

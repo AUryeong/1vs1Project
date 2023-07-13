@@ -1,32 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class ItemInven : MonoBehaviour
 {
-    protected Item _item;
+    private Item item;
     [SerializeField] protected TextMeshProUGUI itemText;
 
-    public RectTransform rectTransform
-    {
-        get
-        {
-            return (RectTransform)transform;
-        }
-    }
+    public RectTransform RectTransform => (RectTransform)transform;
 
-    public Item item
+    public Item Item
     {
-        get
-        {
-            return _item;
-        }
+        get => item;
         set
         {
-            _item = value;
-            itemText.text = _item.GetName();
+            item = value;
+            itemText.text = item.GetName();
         }
     }
 }

@@ -14,7 +14,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     protected override void OnReset()
     {
-        foreach (Item item in items.Values)
+        foreach (var item in items.Values)
             item.OnReset();
     }
 

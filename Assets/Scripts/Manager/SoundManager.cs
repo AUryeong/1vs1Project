@@ -30,8 +30,8 @@ public class SoundManager : Singleton<SoundManager>
         AddAudioType(SoundType.Se, SaveManager.Instance.SaveData.sfxVolume);
         AddAudioType(SoundType.BGM, SaveManager.Instance.SaveData.bgmVolume).loop = true;
 
-        AudioClip[] clips = Resources.LoadAll<AudioClip>("Sounds/");
-        foreach (AudioClip clip in clips)
+        var clips = Resources.LoadAll<AudioClip>("Sounds/");
+        foreach (var clip in clips)
             sounds[clip.name] = clip;
     }
 

@@ -3,62 +3,54 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
-using UnityEngine.Serialization;
+
+public enum CharacterType
+{
+    Bp153,
+    Plus3000,
+    Flip3
+}
 
 public class InGameManager : Singleton<InGameManager>
 {
     private readonly Vector3 cameraDistance = new Vector3(0, 0, 100);
 
+    public bool isGaming;
+    private float timer;
+    
+    [Header("맵")]
     public Vector2 minPos;
     public Vector2 maxPos;
-
-    public bool isGaming;
     
-    private float timer;
-    public int killEnemyCount;
+    [SerializeField] private SpriteRenderer carImage;
 
-    #region 보스 관련 변수
-
+    [Header("보스")]
     public bool isBossSummon;
     public bool isBossLiving;
 
-    #endregion
-
-    #region 몹 관련 변수
-
-    [SerializeField] private Enemy enemyBase;
-    public ParticleSystem enemyKillEffect;
-
-    private float enemyCooltime = 0.5f;
+    [Header("적")]
+    public int killEnemyCount;
+    private const float enemyCoolTime = 0.5f;
     private float enemyDuration = 0;
     private float enemyPower = 0;
 
     public Material flashWhiteMaterial;
 
-    #endregion
+    [Header("경험치")]
+    private const float expRandomMin = 0.5f;
+    private const float expRandomMax = 1.5f;
 
-    #region 레벨 변수
+    private const float textFadeInTime = 0.2f;
+    private const float textFadeOutTime = 0.5f;
+    private const float textMoveXPos = 0.7f;
+    private const float textMoveYPos = 1f;
 
-    [FormerlySerializedAs("exp")] [SerializeField] private GameObject expObj;
-    private readonly float expRandomMin = 0.5f;
-    private readonly float expRandomMax = 1.5f;
-
-    #endregion
-
-    #region 움직이는 텍스트 변수
-
-    [SerializeField] private GameObject damageText;
-    private readonly float fadeInTime = 0.2f;
-    private readonly float fadeOutTime = 0.5f;
-    private readonly float moveXPos = 0.7f;
-    private readonly float moveYPos = 1f;
-
-    #endregion
-
+    [Header("스테이지")]
     public int stage;
     [SerializeField] private SpriteRenderer[] stageBackgrounds;
-    [SerializeField] private Boss[] stageBoss;
-    [SerializeField] private SpriteRenderer carImage;
+    
+    [Header("캐릭터")] 
+    [SerializeField] private Dictionary<CharacterType, Player> players;
 
     public int Score => Mathf.RoundToInt(killEnemyCount + (stage - 1) * 1000 + (60 - timer));
 
@@ -81,9 +73,9 @@ public class InGameManager : Singleton<InGameManager>
         
         carImage.gameObject.SetActive(true);
         carImage.transform.position = new Vector3(16, 0, 0);
-        carImage.transform.DOMoveX(0, 2f).SetEase(Ease.OutQuad);
+        carImage.transform.DOMoveX(0, 1f).SetEase(Ease.OutQuad);
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2);
 
         Player.Instance.gameObject.SetActive(true);
 
@@ -103,7 +95,7 @@ public class InGameManager : Singleton<InGameManager>
         carImage.transform.DOMoveX(-48, 6f).SetEase(Ease.InBack).OnComplete(() => { carImage.gameObject.SetActive(false); });
     }
 
-    IEnumerator CarOutro()
+    private IEnumerator CarOutro()
     {
         isGaming = false;
         Vector3 playerPos = Player.Instance.transform.position;
@@ -164,7 +156,7 @@ public class InGameManager : Singleton<InGameManager>
                 UIManager.Instance.BossSetting("지우개 부릉이");
                 break;
             case 2:
-                UIManager.Instance.BossSetting("지우개 부릉이");
+                UIManager.Instance.BossSetting("화이트 걸");
                 break;
         }
     }
@@ -238,9 +230,9 @@ public class InGameManager : Singleton<InGameManager>
     private void EnemyCreate()
     {
         enemyDuration += Time.deltaTime + Time.deltaTime * 0.002f * enemyPower/2;
-        if (enemyDuration >= enemyCooltime)
+        if (enemyDuration >= enemyCoolTime)
         {
-            enemyDuration -= enemyCooltime;
+            enemyDuration -= enemyCoolTime;
             enemyPower++;
             GameObject obj = PoolManager.Instance.Init("Enemy");
             obj.transform.position = Player.Instance.transform.position + (Vector3)Random.insideUnitCircle.normalized * 15;
@@ -299,12 +291,12 @@ public class InGameManager : Singleton<InGameManager>
         textMesh.text = text;
         textMesh.color = new Color(color.r, color.g, color.b, 0);
 
-        textMesh.DOFade(1, fadeInTime).SetEase(Ease.InBack).OnComplete(() => textMesh.DOFade(0, fadeOutTime).SetEase(Ease.InBack));
+        textMesh.DOFade(1, textFadeInTime).SetEase(Ease.InBack).OnComplete(() => textMesh.DOFade(0, textFadeOutTime).SetEase(Ease.InBack));
 
         damageTextObj.transform.position = pos;
 
-        damageTextObj.transform.DOMoveX(damageTextObj.transform.position.x + moveXPos, fadeInTime + fadeOutTime);
-        damageTextObj.transform.DOMoveY(damageTextObj.transform.position.y + moveYPos, fadeInTime + fadeOutTime).SetEase(Ease.OutBack).OnComplete(() => damageTextObj.SetActive(false));
+        damageTextObj.transform.DOMoveX(damageTextObj.transform.position.x + textMoveXPos, textFadeInTime + textFadeOutTime);
+        damageTextObj.transform.DOMoveY(damageTextObj.transform.position.y + textMoveYPos, textFadeInTime + textFadeOutTime).SetEase(Ease.OutBack).OnComplete(() => damageTextObj.SetActive(false));
     }
 
     public void ShowInt(int damage, Vector3 pos, Color color)
@@ -326,5 +318,10 @@ public class InGameManager : Singleton<InGameManager>
         MapSetting();
 
         StartCoroutine(CarIntro());
+    }
+
+    public Player CreatePlayer()
+    {
+        return Instantiate(players[GameManager.Instance.characterType], Vector3.zero, Quaternion.identity);
     }
 }

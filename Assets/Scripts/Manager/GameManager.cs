@@ -2,6 +2,7 @@
 
 public class GameManager : Singleton<GameManager>
 {
+    public CharacterType characterType;
     protected override bool IsDontDestroying => true;
     public Camera MainCamera
     {
