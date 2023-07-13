@@ -80,10 +80,8 @@ public class PoolManager : Singleton<PoolManager>
             }
         }
 
-        if (isParent)
-            copy = Instantiate(poolData.origin, poolData.parent);
-        else
-            copy = Instantiate(poolData.origin);
+        copy = isParent ? Instantiate(poolData.origin, poolData.parent) : Instantiate(poolData.origin);
+        
         pools[origin].poolingObjects.Add(copy);
         copy.SetActive(true);
         return copy;

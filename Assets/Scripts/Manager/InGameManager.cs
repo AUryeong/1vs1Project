@@ -295,8 +295,8 @@ public class InGameManager : Singleton<InGameManager>
 
         damageTextObj.transform.position = pos;
 
-        damageTextObj.transform.DOMoveX(damageTextObj.transform.position.x + textMoveXPos, textFadeInTime + textFadeOutTime);
-        damageTextObj.transform.DOMoveY(damageTextObj.transform.position.y + textMoveYPos, textFadeInTime + textFadeOutTime).SetEase(Ease.OutBack).OnComplete(() => damageTextObj.SetActive(false));
+        damageTextObj.transform.DOMoveX(textMoveXPos, textFadeInTime + textFadeOutTime).SetRelative();
+        damageTextObj.transform.DOMoveY(textMoveYPos, textFadeInTime + textFadeOutTime).SetRelative().SetEase(Ease.OutBack).OnComplete(() => damageTextObj.SetActive(false));
     }
 
     public void ShowInt(int damage, Vector3 pos, Color color)
