@@ -59,11 +59,4 @@ public class CarBoss : Boss
         }
     }
 
-    protected override void Die()
-    {
-        base.Die();
-        Time.timeScale = 0;
-        InGameManager.Instance.isGaming = false;
-        UIManager.Instance.GameWin();
-    }
 }

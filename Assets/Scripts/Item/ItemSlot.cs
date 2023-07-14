@@ -2,8 +2,9 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
+using UnityEngine.EventSystems;
 
-public class ItemSlot : MonoBehaviour
+public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [SerializeField] private TextMeshProUGUI itemName;
     [SerializeField] private TextMeshProUGUI itemLore;
@@ -26,27 +27,24 @@ public class ItemSlot : MonoBehaviour
             itemLore.text = item.GetLore();
         }
     }
-    public Button Button
-    {
-        get;
-        private set;
-    }
-    private readonly float selectMovePosX = -100;
-    private readonly float deselectMovePosX = 0;
 
     protected void Awake()
     {
         RectTransform = GetComponent<RectTransform>();
-        Button = GetComponent<Button>();
     }
 
-    public void SlotSelect()
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        RectTransform.DOAnchorPosX(selectMovePosX, 0.3f).SetUpdate(true);
+        RectTransform.DOScale(Vector3.one * 1.2f, 0.5f).SetUpdate(true);
     }
 
-    public void SlotDeselect()
+    public void OnPointerExit(PointerEventData eventData)
     {
-        RectTransform.DOAnchorPosX(deselectMovePosX, 0.3f).SetUpdate(true);
+        RectTransform.DOScale(Vector3.one, 0.5f).SetUpdate(true);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        UIManager.Instance.EndChooseItem(this);
     }
 }

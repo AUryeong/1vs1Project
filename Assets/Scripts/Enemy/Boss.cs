@@ -24,16 +24,6 @@ public class Boss : Enemy
     protected override void Die()
     {
         base.Die();
-        InGameManager.Instance.isBossLiving = false;
-        UIManager.Instance.BossRemoveSetting();
-        switch (InGameManager.Instance.stage)
-        {
-            case 1:
-                SoundManager.Instance.PlaySound("bgm", SoundType.BGM);
-                break;
-            case 2:
-                SoundManager.Instance.PlaySound("bgm2", SoundType.BGM);
-                break;
-        }
+        InGameManager.Instance.DieBoss();
     }
 }

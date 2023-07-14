@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -38,6 +39,18 @@ public class PoolManager : Singleton<PoolManager>
     protected override void OnReset()
     {
         DisableAllObjects();
+    }
+
+    public void DisableObjects(string poolName)
+    {
+        foreach(var obj in pools[poolName].poolingObjects)
+            obj.gameObject.SetActive(false);
+    }
+
+    public void ActionObjects(string poolName, Action<GameObject> action = null)
+    {
+        foreach (var obj in pools[poolName].poolingObjects)
+            action?.Invoke(obj);
     }
 
     public void AddPoolData(string poolName, GameObject origin)

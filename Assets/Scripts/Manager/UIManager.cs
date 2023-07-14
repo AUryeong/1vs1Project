@@ -9,8 +9,12 @@ public class UIManager : Singleton<UIManager>
 {
     [SerializeField] private Image mouseCursor;
 
-    [Header("프로필 변수")] [SerializeField] private Image hpBar;
+    [Header("프로필 변수")]
+    [SerializeField] private Image profile;
+    [SerializeField] private Image hpBar;
     [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI timerText;
+    [SerializeField] private TextMeshProUGUI killEnemyText;
 
     [Header("게임 오버 변수")]
     [SerializeField] private Image gameOverWindow;
@@ -22,15 +26,17 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private TextMeshProUGUI gameWinText;
     [SerializeField] private Button gameWinButton;
 
-    [Header("무기 획득 변수")] 
+    [Header("무기 획득 변수")]
+    [SerializeField] private TextMeshProUGUI levelUpText;
+    [SerializeField] private GameObject particleParent;
+    private Vector3 particleDistance;
     [SerializeField] private GameObject levelUpUI;
     [SerializeField] private ItemSlot[] itemSlots;
 
     private bool itemSlotActivating;
 
-    [Header("타이머 변수")] [SerializeField] private TextMeshProUGUI timerText;
-
-    [Header("레벨 변수")] [SerializeField] private Image lvBarImage;
+    [Header("레벨 변수")] 
+    [SerializeField] private Image lvBarImage;
     [SerializeField] private TextMeshProUGUI lvBarText;
 
     [Header("보스 변수")] 
@@ -50,9 +56,18 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private TextMeshProUGUI scoreLvText;
     [SerializeField] private Button scoreNextStageButton;
 
+    [Header("캐릭별 이미지")]
+    [SerializeField] private Dictionary<CharacterType, Sprite> sdSprites = new Dictionary<CharacterType, Sprite>();
+    [SerializeField] private Dictionary<CharacterType, Sprite> ldSprites = new Dictionary<CharacterType, Sprite>();
+    [SerializeField] private Dictionary<CharacterType, Sprite> profileSprites = new Dictionary<CharacterType, Sprite>();
+    
+    [SerializeField] private Image[] sdCharacters;
+    [SerializeField] private Image[] ldCharacters;
+    [SerializeField] private Image[] profileCharacters;
 
     protected override void OnCreated()
     {
+        profile.gameObject.SetActive(false);
         levelUpUI.gameObject.SetActive(false);
         gameOverWindow.gameObject.SetActive(false);
         gameWinWindow.gameObject.SetActive(false);
@@ -77,8 +92,37 @@ public class UIManager : Singleton<UIManager>
 
         Cursor.visible = false;
 
+        particleDistance = particleParent.transform.position;
+        particleParent.SetActive(false);
+
         UpdateLevel();
         UpdateHp(1);
+        UpdateKillEnemyCount(0);
+        CharacterImageSetting();
+    }
+
+    private void CharacterImageSetting()
+    {
+        Sprite sdSprite = sdSprites[GameManager.Instance.characterType];
+        foreach(var image in sdCharacters)
+        {
+            image.sprite = sdSprite;
+            image.SetNativeSize();
+        }
+
+        Sprite ldSprite = ldSprites[GameManager.Instance.characterType];
+        foreach (var image in ldCharacters)
+        {
+            image.sprite = ldSprite;
+            image.SetNativeSize();
+        }
+
+        Sprite profileSprite = profileSprites[GameManager.Instance.characterType];
+        foreach (var image in profileCharacters)
+        {
+            image.sprite = profileSprite;
+            image.SetNativeSize();
+        }
     }
 
     public void UpdateHp(float value)
@@ -118,7 +162,42 @@ public class UIManager : Singleton<UIManager>
         MouseUpdate();
         if (!InGameManager.Instance.isGaming) return;
 
+        TextUpdate();
         ScoreUpdate();
+    }
+
+    public void GameStart()
+    {
+        profile.gameObject.SetActive(true);
+    }
+
+    private void TextUpdate()
+    {
+        if (levelUpUI.gameObject.activeSelf)
+        {
+            levelUpText.ForceMeshUpdate();
+            TMP_TextInfo textInfo = levelUpText.textInfo;
+            for (int i = 0; i < textInfo.characterCount; ++i)
+            {
+                TMP_CharacterInfo charInfo = textInfo.characterInfo[i];
+
+                if (!charInfo.isVisible)
+                    continue;
+
+                Vector3[] vectors = textInfo.meshInfo[charInfo.materialReferenceIndex].vertices;
+                for (int j = 0; j < 4; ++j)
+                {
+                    var vector = vectors[charInfo.vertexIndex + j];
+                    vectors[charInfo.vertexIndex + j] = vector + new Vector3(0, Mathf.Sin(Time.unscaledTime + i * 2) * 3, 0);
+                }
+            }
+            for (int i = 0; i < textInfo.meshInfo.Length; ++i)
+            {
+                var meshinfo = textInfo.meshInfo[i];
+                meshinfo.mesh.vertices = meshinfo.vertices;
+                levelUpText.UpdateGeometry(meshinfo.mesh, i);
+            }
+        }
     }
 
     private void MouseUpdate()
@@ -129,13 +208,12 @@ public class UIManager : Singleton<UIManager>
 
     private void ScoreUpdate()
     {
-        scoreText.text = "점수 : " + InGameManager.Instance.Score;
+        scoreText.text = InGameManager.Instance.Score + "점";
     }
 
     public void BossSetting(string bossName)
     {
         bossNameText.text = bossName;
-        timerText.text = "!!! 보스 출현 !!!";
         bossWarning.gameObject.SetActive(true);
         bossWarning.color = new Color(1, 0, 0, 0);
         
@@ -158,6 +236,11 @@ public class UIManager : Singleton<UIManager>
     public void UpdateBossHp(float fillAmount)
     {
         bossGaugeBar.fillAmount = fillAmount;
+    }
+
+    public void UpdateKillEnemyCount(int count)
+    {
+        killEnemyText.text = count.ToString();
     }
 
     public bool IsActable()
@@ -188,6 +271,10 @@ public class UIManager : Singleton<UIManager>
     public void StartChooseItem(List<Item> items)
     {
         itemSlotActivating = true;
+
+        particleParent.SetActive(true);
+        particleParent.transform.position = Player.Instance.transform.position + particleDistance;
+        
         SoundManager.Instance.PlaySound("level up", SoundType.Se , 0.8f);
         levelUpUI.gameObject.SetActive(true);
         Time.timeScale = 0;
@@ -196,20 +283,15 @@ public class UIManager : Singleton<UIManager>
         {
             var itemSlot = itemSlots[i];
             itemSlot.Item = items[i];
-            itemSlot.Button.onClick.AddListener(() => EndChooseItem(itemSlot));
         }
-
-        foreach (var itemSLot in itemSlots)
-            itemSLot.SlotSelect();
-
-        foreach (ItemSlot itemSlot in itemSlots)
-            itemSlot.RectTransform.anchoredPosition = Vector2.zero;
     }
 
-    private void EndChooseItem(ItemSlot chooseItemSlot)
+    public void EndChooseItem(ItemSlot chooseItemSlot)
     {
         if (!itemSlotActivating) return;
-        
+
+        particleParent.SetActive(false);
+
         itemSlotActivating = false;
         SoundManager.Instance.PlaySound("item get", SoundType.Se , 0.6f);
 
@@ -221,10 +303,7 @@ public class UIManager : Singleton<UIManager>
     public void UpdateTimer(float timer)
     {
         int timerInt = Mathf.CeilToInt(timer);
-        if (InGameManager.Instance.isBossSummon)
-            timerText.text = "이동까지 " + (timerInt / 60).ToString("D2") + " : " + (timerInt % 60).ToString("D2");
-        else
-            timerText.text = "보스 출현까지 " + (timerInt / 60).ToString("D2") + " : " + (timerInt % 60).ToString("D2");
+        timerText.text = (timerInt / 60).ToString("D2") + " : " + (timerInt % 60).ToString("D2");
     }
 
     public void UpdateLevel()

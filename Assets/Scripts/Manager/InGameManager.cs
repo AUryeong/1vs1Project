@@ -27,6 +27,7 @@ public class InGameManager : Singleton<InGameManager>
     [Header("보스")]
     public bool isBossSummon;
     public bool isBossLiving;
+    private float lastTimer;
 
     [Header("적")]
     public int killEnemyCount;
@@ -52,12 +53,12 @@ public class InGameManager : Singleton<InGameManager>
     [Header("캐릭터")] 
     [SerializeField] private Dictionary<CharacterType, Player> players;
 
-    public int Score => Mathf.RoundToInt(killEnemyCount + (stage - 1) * 1000 + (60 - timer));
+    public int Score => Mathf.RoundToInt(killEnemyCount * 3 + (stage - 1) * 1000 + timer);
 
     protected override void OnCreated()
     {
         stage = 1;
-        timer = 60;
+        timer = 0;
         killEnemyCount = 0;
 
         MapSetting();
@@ -77,6 +78,7 @@ public class InGameManager : Singleton<InGameManager>
 
         yield return new WaitForSeconds(2);
 
+        UIManager.Instance.GameStart();
         Player.Instance.gameObject.SetActive(true);
 
         isGaming = true;
@@ -95,10 +97,32 @@ public class InGameManager : Singleton<InGameManager>
         carImage.transform.DOMoveX(-48, 6f).SetEase(Ease.InBack).OnComplete(() => { carImage.gameObject.SetActive(false); });
     }
 
+    public void DieBoss()
+    {
+        isBossLiving = false;
+        lastTimer = timer;
+        PoolManager.Instance.ActionObjects("Exp", (obj) =>
+        {
+            obj.GetComponent<Exp>().OnGet();
+        });
+        UIManager.Instance.BossRemoveSetting();
+        switch (stage)
+        {
+            case 1:
+                SoundManager.Instance.PlaySound("bgm", SoundType.BGM);
+                break;
+            case 2:
+                SoundManager.Instance.PlaySound("bgm2", SoundType.BGM);
+                break;
+        }
+    }
+
     private IEnumerator CarOutro()
     {
         isGaming = false;
         Vector3 playerPos = Player.Instance.transform.position;
+        PoolManager.Instance.DisableObjects("Enemy");
+        yield return new WaitForSeconds(2);
 
         carImage.gameObject.SetActive(true);
         carImage.transform.position = new Vector3(playerPos.x + 16, playerPos.y, playerPos.y);
@@ -119,20 +143,20 @@ public class InGameManager : Singleton<InGameManager>
 
     private void TimerUpdate()
     {
-        if (isBossLiving) return;
-
-        timer -= Time.deltaTime;
+        timer += Time.deltaTime;
         UIManager.Instance.UpdateTimer(timer);
-        if (timer <= 0)
+        if (!isBossSummon)
         {
-            if (stage == 1 || isBossSummon)
-            {
-                isBossLiving = true;
-                StartCoroutine(CarOutro());
-            }
-            else
+            if (stage == 1 && timer >= 100)
             {
                 BossSummon();
+            }
+        }
+        else
+        {
+            if (!isBossLiving && timer - lastTimer > 10)
+            {
+                StartCoroutine(CarOutro());
             }
         }
     }
@@ -141,8 +165,6 @@ public class InGameManager : Singleton<InGameManager>
     {
         isBossSummon = true;
         isBossLiving = true;
-
-        timer = 10;
 
         SoundManager.Instance.PlaySound("boss", SoundType.BGM);
         SoundManager.Instance.PlaySound("warning");
@@ -196,6 +218,7 @@ public class InGameManager : Singleton<InGameManager>
     public void OnKill(Enemy enemy)
     {
         killEnemyCount++;
+        UIManager.Instance.UpdateKillEnemyCount(killEnemyCount);
 
         var exp = PoolManager.Instance.Init("Exp").GetComponent<Exp>();
 
@@ -267,8 +290,7 @@ public class InGameManager : Singleton<InGameManager>
         {
             if (itemList.Count <= 0)
             {
-                Debug.LogAssertion("오류!");
-                return;
+                continue;
             }
 
             Item addItem = itemList.SelectOne();
@@ -313,7 +335,6 @@ public class InGameManager : Singleton<InGameManager>
         stage++;
 
         Player.Instance.stat.hp = Player.Instance.stat.maxHp;
-        timer = 100;
         
         MapSetting();
 
