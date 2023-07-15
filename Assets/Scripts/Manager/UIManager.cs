@@ -208,7 +208,7 @@ public class UIManager : Singleton<UIManager>
 
     private void ScoreUpdate()
     {
-        scoreText.text = InGameManager.Instance.Score + "Á¡";
+        scoreText.text = InGameManager.Instance.Score.ToString();
     }
 
     public void BossSetting(string bossName)
