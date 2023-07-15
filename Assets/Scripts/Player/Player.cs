@@ -22,6 +22,14 @@ public class Player : Unit
     public Stat defaultStat;
     private readonly List<Item> items = new List<Item>();
 
+    public Vector3 GunPos
+    {
+        get
+        {
+            return gun.transform.position;
+        }
+    }
+
     #region 레벨 변수
 
     public float xpAdd = 100f;

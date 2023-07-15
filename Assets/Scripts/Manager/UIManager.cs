@@ -188,7 +188,7 @@ public class UIManager : Singleton<UIManager>
                 for (int j = 0; j < 4; ++j)
                 {
                     var vector = vectors[charInfo.vertexIndex + j];
-                    vectors[charInfo.vertexIndex + j] = vector + new Vector3(0, Mathf.Sin(Time.unscaledTime + i * 2) * 3, 0);
+                    vectors[charInfo.vertexIndex + j] = vector + new Vector3(0, Mathf.Sin(Time.unscaledTime + i) * 10, 0);
                 }
             }
             for (int i = 0; i < textInfo.meshInfo.Length; ++i)
@@ -245,7 +245,7 @@ public class UIManager : Singleton<UIManager>
 
     public bool IsActable()
     {
-        return !levelUpUI.gameObject.activeSelf && Time.timeScale != 0 && InGameManager.Instance.isGaming;
+        return !levelUpUI.activeSelf && Time.timeScale != 0 && InGameManager.Instance.isGaming;
     }
 
     public void GameWin()

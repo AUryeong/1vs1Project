@@ -23,35 +23,43 @@ public class Bp153 : Projectile
         {
             if (isPenetrating)
                 gameObject.SetActive(false);
+
             isPenetrating = true;
             return;
         }
-        
+
         gameObject.SetActive(false);
     }
 
-    public void OnCreate(Vector3 wantPos, Vector3 size)
+    public void OnCreate(Vector3 mousePos, Vector3 size)
     {
         isHitable = true;
         isPenetrating = false;
+
         spriteRenderer.color = Color.white;
-
-        transform.position = Player.Instance.transform.position;
-        float angle = Mathf.Atan2(wantPos.y - transform.position.y, wantPos.x - transform.position.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0,0,angle+180);
-
         transform.localScale = size;
+        transform.position = Player.Instance.GunPos;
+
+        float angle = Mathf.Atan2(mousePos.y - transform.position.y, mousePos.x - transform.position.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle + 180);
+
         StartCoroutine(OnDisableCoroutine());
     }
 
     private void Update()
     {
-        transform.Translate(Vector3.left * (Time.deltaTime * shootSpeed));
+        Move();
     }
+
+    private void Move()
+    {
+        transform.Translate(Time.deltaTime * shootSpeed * Vector3.left);
+    }
+
     private IEnumerator OnDisableCoroutine()
     {
         yield return new WaitForSeconds(duration);
-        
+
         spriteRenderer.DOFade(0, fadeOutDuration).SetEase(Ease.InQuint).
             OnComplete(() => gameObject.SetActive(false));
     }
