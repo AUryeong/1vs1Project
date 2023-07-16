@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class Item
 {
     private string name;
@@ -5,6 +7,7 @@ public class Item
 
     //비 획득은 0, 획득 부터 1 시작
     public int Upgrade { get; private set; }
+    public Sprite ItemIcon { get; private set; }
     private int maxUpgrade;
 
     /// <summary>
@@ -13,9 +16,11 @@ public class Item
     /// <param name="itemName">아이템 이름</param>
     /// <param name="itemLore">아이템 설명들</param>
     /// <param name="itemMaxUpgrade">최대 업그레이드 횟수</param>
-    public void Init(string itemName, string[] itemLore, int itemMaxUpgrade)
+    /// <param name="icon">아이콘</param>
+    public void Init(string itemName, string[] itemLore, int itemMaxUpgrade, Sprite icon)
     {
         name = itemName;
+        ItemIcon = icon;
         lore = itemLore;
         maxUpgrade = itemMaxUpgrade;
         OnReset();

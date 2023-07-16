@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
-using UnityEngine.Serialization;
 
 public class UIManager : Singleton<UIManager>
 {
@@ -20,11 +19,6 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private Image gameOverWindow;
     [SerializeField] private TextMeshProUGUI gameOverText;
     [SerializeField] private Button gameOverButton;
-    
-    [Header("게임 승리 변수")]
-    [SerializeField] private Image gameWinWindow;
-    [SerializeField] private TextMeshProUGUI gameWinText;
-    [SerializeField] private Button gameWinButton;
 
     [Header("무기 획득 변수")]
     [SerializeField] private TextMeshProUGUI levelUpText;
@@ -45,16 +39,28 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private Image bossGaugeBar;
     [SerializeField] private Image bossWarning;
 
-    [Header("이동 중 배경")] 
-    [SerializeField] private Image moveBackground;
-    [SerializeField] private Image moveCartoon;
-
     [Header("점수")] 
     [SerializeField] private Image scoreBackground;
     [SerializeField] private TextMeshProUGUI scoreScoreText;
     [SerializeField] private TextMeshProUGUI scoreEnemyText;
     [SerializeField] private TextMeshProUGUI scoreLvText;
+    [SerializeField] private Image scoreCharacter;
+    [SerializeField] private Image scoreEnemyCount;
+    [SerializeField] private Image scoreForeground;
+    [SerializeField] private Image scoreWindow;
     [SerializeField] private Button scoreNextStageButton;
+
+    [Header("ESC 변수")] 
+    [SerializeField] private Image escBackground;
+    [SerializeField] private Image escWindow;
+    [SerializeField] private Button resumeButton;
+    [SerializeField] private Button settingButton;
+    [SerializeField] private Button exitButton;
+    [SerializeField] private List<ItemInventory> itemInventories;
+    [SerializeField] private Image settingWindow;
+    [SerializeField] private Slider bgmSlider;
+    [SerializeField] private Slider sfxSlider;
+    [SerializeField] private Button settingExitButton;
 
     [Header("캐릭별 이미지")]
     [SerializeField] private Dictionary<CharacterType, Sprite> sdSprites = new Dictionary<CharacterType, Sprite>();
@@ -68,24 +74,49 @@ public class UIManager : Singleton<UIManager>
     protected override void OnCreated()
     {
         profile.gameObject.SetActive(false);
+        timerText.gameObject.SetActive(false);
         levelUpUI.gameObject.SetActive(false);
         gameOverWindow.gameObject.SetActive(false);
-        gameWinWindow.gameObject.SetActive(false);
         bossBar.gameObject.SetActive(false);
         bossWarning.gameObject.SetActive(false);
         scoreBackground.gameObject.SetActive(false);
-        moveBackground.gameObject.SetActive(false);
+        escBackground.gameObject.SetActive(false);
         
         itemSlotActivating = false;
 
         gameOverButton.onClick.RemoveAllListeners();
-        gameOverButton.onClick.AddListener(GameOverButton);
-
-        gameWinButton.onClick.RemoveAllListeners();
-        gameWinButton.onClick.AddListener(GameOverButton);
+        gameOverButton.onClick.AddListener(GameExitButton);
         
         scoreNextStageButton.onClick.RemoveAllListeners();
         scoreNextStageButton.onClick.AddListener(InGameManager.Instance.NextStage);
+        
+        resumeButton.onClick.RemoveAllListeners();
+        resumeButton.onClick.AddListener(EscExit);
+        
+        settingButton.onClick.RemoveAllListeners();
+        settingButton.onClick.AddListener(SettingSetting);
+        
+        exitButton.onClick.RemoveAllListeners();
+        exitButton.onClick.AddListener(GameExitButton);
+        
+        bgmSlider.value = SaveManager.Instance.SaveData.bgmVolume;
+        bgmSlider.onValueChanged.RemoveAllListeners();
+        bgmSlider.onValueChanged.AddListener((value)=>
+        {
+            SoundManager.Instance.VolumeChange(SoundType.BGM, value);  
+        });
+
+        sfxSlider.value = SaveManager.Instance.SaveData.sfxVolume;
+        sfxSlider.onValueChanged.RemoveAllListeners();
+        sfxSlider.onValueChanged.AddListener((value)=>
+        {
+            SoundManager.Instance.VolumeChange(SoundType.Se, value);  
+        });
+        
+        settingExitButton.onClick.RemoveAllListeners();
+        settingExitButton.onClick.AddListener(SettingExit);
+        
+        settingWindow.gameObject.SetActive(false);
 
         TransitionManager.Instance.background.gameObject.SetActive(false);
         TransitionManager.Instance.transitionSquare.gameObject.SetActive(false);
@@ -99,6 +130,23 @@ public class UIManager : Singleton<UIManager>
         UpdateHp(1);
         UpdateKillEnemyCount(0);
         CharacterImageSetting();
+    }
+
+    private void SettingSetting()
+    {
+        settingWindow.gameObject.SetActive(true);
+        settingWindow.rectTransform.DOKill();
+        settingWindow.rectTransform.localScale = Vector3.zero;
+        
+        settingWindow.rectTransform.DOScale(1, 0.3f).SetEase(Ease.InQuad).SetUpdate(true);
+    }
+
+    private void SettingExit()
+    {
+        settingWindow.rectTransform.DOKill();
+        settingWindow.rectTransform.localScale = Vector3.one;
+        
+        settingWindow.rectTransform.DOScale(0, 0.3f).SetUpdate(true).OnComplete(() => settingWindow.gameObject.SetActive(false));
     }
 
     private void CharacterImageSetting()
@@ -130,20 +178,7 @@ public class UIManager : Singleton<UIManager>
         hpBar.DOFillAmount(value, 0.3f).SetUpdate(true);
     }
 
-    public void MoveBackgroundSetting()
-    {
-        moveBackground.gameObject.SetActive(true);
-
-        moveBackground.color = moveBackground.color.FadeChange(0);
-        moveBackground.DOFade(1, 1).OnComplete(ScoreSetting);
-        moveBackground.DOFade(0, 1).SetDelay(3).OnComplete(() => moveBackground.gameObject.SetActive(false));
-
-        moveCartoon.color = moveCartoon.color.FadeChange(0);
-        moveCartoon.DOFade(1, 1);
-        moveCartoon.DOFade(0, 1).SetDelay(3).OnComplete(() => moveCartoon.gameObject.SetActive(false));
-    }
-
-    private void ScoreSetting()
+    public void ScoreSetting()
     {
         scoreBackground.gameObject.SetActive(true);
         scoreEnemyText.text = InGameManager.Instance.killEnemyCount.ToString();
@@ -154,21 +189,79 @@ public class UIManager : Singleton<UIManager>
     public void NextStageSetting()
     {
         scoreBackground.gameObject.SetActive(false);
-        moveBackground.gameObject.SetActive(false);
     }
 
     private void Update()
     {
         MouseUpdate();
-        if (!InGameManager.Instance.isGaming) return;
+        if (!InGameManager.Instance.isGaming)
+        {
+            EscExitUpdate();
+            return;
+        }
 
         TextUpdate();
         ScoreUpdate();
+        EscEnterUpdate();
+    }
+
+    private void EscEnterUpdate()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            EscSetting();
+        }
+    }
+
+    private void EscExitUpdate()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            EscExit();
+        }
+    }
+
+    private void EscExit()
+    {
+        InGameManager.Instance.isGaming = true;
+        if(!itemSlotActivating) 
+            Time.timeScale = 1;
+            
+        escBackground.gameObject.SetActive(false);
+    }
+
+    private void EscSetting()
+    {
+        InGameManager.Instance.isGaming = false;
+        Time.timeScale = 0;
+        
+        escBackground.gameObject.SetActive(true);
+
+        settingWindow.gameObject.SetActive(false);
+        
+        escWindow.rectTransform.DOKill();
+        escWindow.rectTransform.localScale = Vector3.zero;
+        escWindow.rectTransform.DOScale(1, 0.5f).SetEase(Ease.OutBack).SetUpdate(true);
+
+        var items = Player.Instance.GetInventory();
+        for (int i = 0; i < itemInventories.Count; i++)
+        {
+            if (items.Count > i)
+            {
+                itemInventories[i].gameObject.SetActive(true);
+                itemInventories[i].Init(items[i]);
+            }
+            else
+            {
+                itemInventories[i].gameObject.SetActive(false);
+            }
+        }
     }
 
     public void GameStart()
     {
         profile.gameObject.SetActive(true);
+        timerText.gameObject.SetActive(true);
     }
 
     private void TextUpdate()
@@ -248,19 +341,13 @@ public class UIManager : Singleton<UIManager>
         return !levelUpUI.activeSelf && Time.timeScale != 0 && InGameManager.Instance.isGaming;
     }
 
-    public void GameWin()
-    {
-        gameWinWindow.gameObject.SetActive(true);
-        gameWinText.text = $"획득한 점수 : {InGameManager.Instance.Score}";
-    }
-
     public void GameOver()
     {
         gameOverWindow.gameObject.SetActive(true);
         gameOverText.text = $"획득한 점수 : {InGameManager.Instance.Score}";
     }
 
-    private void GameOverButton()
+    private void GameExitButton()
     {
         TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade, () =>
         {

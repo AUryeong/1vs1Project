@@ -73,7 +73,7 @@ public class PoolManager : Singleton<PoolManager>
                 obj.gameObject.SetActive(false);
     }
 
-    public GameObject Init(string origin, bool isParent = true)
+    public GameObject Init(string origin)
     {
         if (string.IsNullOrEmpty(origin) || !pools.ContainsKey(origin))
         {
@@ -93,7 +93,7 @@ public class PoolManager : Singleton<PoolManager>
             }
         }
 
-        copy = isParent ? Instantiate(poolData.origin, poolData.parent) : Instantiate(poolData.origin);
+        copy = Instantiate(poolData.origin, poolData.parent);
         
         pools[origin].poolingObjects.Add(copy);
         copy.SetActive(true);

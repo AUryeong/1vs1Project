@@ -12,6 +12,11 @@ public static class Utility
         return tList[Random.Range(0, tList.Count)];
     }
 
+    public static Vector3 ZChange(this Vector3 vector)
+    {
+        return new Vector3(vector.x, vector.y, vector.y);
+    }
+
     public static Vector3 Beizer(Vector3 a, Vector3 b, Vector3 c, float t)
     {
         var ab = Vector3.Lerp(a, b, t);

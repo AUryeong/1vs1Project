@@ -25,17 +25,21 @@ public class TitleManager : MonoBehaviour
 
     private void Awake()
     {
+        Cursor.visible = true;
+        Time.timeScale = 1;
+        PoolManager.Instance.DisableAllObjects();
+        
         GameManager.Instance.MainCamera.transform.position = new Vector3(0, 0, -10);
 
-        bgmSlider.onValueChanged.RemoveAllListeners();
         bgmSlider.value = SaveManager.Instance.SaveData.bgmVolume;
+        bgmSlider.onValueChanged.RemoveAllListeners();
         bgmSlider.onValueChanged.AddListener((value)=>
         {
           SoundManager.Instance.VolumeChange(SoundType.BGM, value);  
         });
 
-        sfxSlider.onValueChanged.RemoveAllListeners();
         sfxSlider.value = SaveManager.Instance.SaveData.sfxVolume;
+        sfxSlider.onValueChanged.RemoveAllListeners();
         sfxSlider.onValueChanged.AddListener((value)=>
         {
             SoundManager.Instance.VolumeChange(SoundType.Se, value);  

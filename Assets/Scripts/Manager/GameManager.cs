@@ -14,4 +14,5 @@ public class GameManager : Singleton<GameManager>
         }
     }
     private Camera mainCamera;
+
 }

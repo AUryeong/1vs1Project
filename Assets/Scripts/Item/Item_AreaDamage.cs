@@ -5,7 +5,7 @@ public class Item_AreaDamage : Item
     private float duration = 0;
     private const float coolTime = 0.3f;
 
-    private const float defaultDamagePercent = 0.4f;
+    private const float defaultDamagePercent = 0.1f;
 
     private float damagePercent;
 

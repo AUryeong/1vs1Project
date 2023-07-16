@@ -7,6 +7,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
     protected override bool IsDontDestroying => true;
     
     private readonly Dictionary<string, Item> items = new Dictionary<string, Item>();
+    private readonly Dictionary<string, Sprite> itemIcon = new Dictionary<string, Sprite>();
     protected override void OnCreated()
     {
         ReadResource();
@@ -22,6 +23,9 @@ public class ResourcesManager : Singleton<ResourcesManager>
     {
         foreach (var projectile in Resources.LoadAll<GameObject>(nameof(Projectile)))
             PoolManager.Instance.AddPoolData(projectile.name, projectile);
+        
+        foreach (var icon in Resources.LoadAll<Sprite>(nameof(Item) + "/Icon"))
+            itemIcon.Add(icon.name, icon);
 
         ReadItem();
     }
@@ -56,7 +60,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
                 lore.Add(texts[i + 2]);
             }
 
-            item.Init(itemName, lore.ToArray(), lore.Count - 1);
+            item.Init(itemName, lore.ToArray(), lore.Count - 1, itemIcon.ContainsKey(itemName) ? itemIcon[itemName] : null);
 
             items.Add(codeItemName, item);
         }

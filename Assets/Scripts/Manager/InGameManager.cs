@@ -17,28 +17,24 @@ public class InGameManager : Singleton<InGameManager>
 
     public bool isGaming;
     private float timer;
-    
-    [Header("맵")]
-    public Vector2 minPos;
+
+    [Header("맵")] public Vector2 minPos;
     public Vector2 maxPos;
-    
+
     [SerializeField] private SpriteRenderer carImage;
 
-    [Header("보스")]
-    public bool isBossSummon;
+    [Header("보스")] public bool isBossSummon;
     public bool isBossLiving;
     private float lastTimer;
 
-    [Header("적")]
-    public int killEnemyCount;
+    [Header("적")] public int killEnemyCount;
     private const float enemyCoolTime = 0.5f;
     private float enemyDuration = 0;
-    private float enemyPower = 0;
+    [SerializeField] private float enemyPower = 0;
 
     public Material flashWhiteMaterial;
 
-    [Header("경험치")]
-    private const float expRandomMin = 0.5f;
+    [Header("경험치")] private const float expRandomMin = 0.5f;
     private const float expRandomMax = 1.5f;
 
     private const float textFadeInTime = 0.2f;
@@ -46,12 +42,10 @@ public class InGameManager : Singleton<InGameManager>
     private const float textMoveXPos = 0.7f;
     private const float textMoveYPos = 1f;
 
-    [Header("스테이지")]
-    public int stage;
+    [Header("스테이지")] public int stage;
     [SerializeField] private SpriteRenderer[] stageBackgrounds;
-    
-    [Header("캐릭터")] 
-    [SerializeField] private Dictionary<CharacterType, Player> players;
+
+    [Header("캐릭터")] [SerializeField] private Dictionary<CharacterType, Player> players;
 
     public int Score => Mathf.RoundToInt(killEnemyCount * 3 + (stage - 1) * 1000 + timer);
 
@@ -63,7 +57,7 @@ public class InGameManager : Singleton<InGameManager>
 
         MapSetting();
         Player.Instance.gameObject.SetActive(false);
-
+        
         TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade, () => StartCoroutine(CarIntro()));
     }
 
@@ -71,7 +65,7 @@ public class InGameManager : Singleton<InGameManager>
     {
         Player.Instance.transform.position = Vector3.zero;
         GameManager.Instance.MainCamera.transform.position = Vector3.zero - cameraDistance;
-        
+
         carImage.gameObject.SetActive(true);
         carImage.transform.position = new Vector3(16, 0, 0);
         carImage.transform.DOMoveX(0, 1f).SetEase(Ease.OutQuad);
@@ -101,10 +95,8 @@ public class InGameManager : Singleton<InGameManager>
     {
         isBossLiving = false;
         lastTimer = timer;
-        PoolManager.Instance.ActionObjects("Exp", (obj) =>
-        {
-            obj.GetComponent<Exp>().OnGet();
-        });
+        PoolManager.Instance.ActionObjects("Enemy", (obj) => { obj.GetComponent<Enemy>().Die(); });
+        PoolManager.Instance.ActionObjects("Exp", (obj) => { obj.GetComponent<Exp>().OnGet(); });
         UIManager.Instance.BossRemoveSetting();
         switch (stage)
         {
@@ -126,7 +118,7 @@ public class InGameManager : Singleton<InGameManager>
 
         carImage.gameObject.SetActive(true);
         carImage.transform.position = new Vector3(playerPos.x + 16, playerPos.y, playerPos.y);
-        carImage.transform.DOMoveX(playerPos.x, 2f).SetEase(Ease.OutQuad);
+        carImage.transform.DOMoveX(playerPos.x, 1f).SetEase(Ease.OutQuad);
 
         yield return new WaitForSeconds(3);
 
@@ -136,8 +128,12 @@ public class InGameManager : Singleton<InGameManager>
 
         carImage.transform.DOMoveX(playerPos.x - 24, 3f).SetEase(Ease.InBack).OnComplete(() =>
         {
-            carImage.gameObject.SetActive(false); 
-            UIManager.Instance.MoveBackgroundSetting();
+            carImage.gameObject.SetActive(false);
+            TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () =>
+            {
+                UIManager.Instance.ScoreSetting();
+                TransitionManager.Instance.TransitionFadeOut();
+            });
         });
     }
 
@@ -151,12 +147,37 @@ public class InGameManager : Singleton<InGameManager>
             {
                 BossSummon();
             }
+
+            if (stage == 2 && timer - lastTimer >= 200)
+            {
+                BossSummon();
+            }
         }
         else
         {
             if (!isBossLiving && timer - lastTimer > 10)
             {
-                StartCoroutine(CarOutro());
+                switch (stage)
+                {
+                    case 1:
+                        StartCoroutine(CarOutro());
+                        break;
+                    case 2:
+                        TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade, () =>
+                        {
+                            Time.timeScale = 0;
+                            isGaming = false;
+                        
+                            CartoonManager.Instance.CartoonPlay(0, ()=>
+                                CartoonManager.Instance.CartoonPlay(1, () =>
+                                    CartoonManager.Instance.CartoonPlay(2,()=>
+                                        TransitionManager.Instance.LoadScene(SceneType.Title))
+                                ));
+                        
+                            TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade);
+                        });
+                        break;
+                }
             }
         }
     }
@@ -205,13 +226,10 @@ public class InGameManager : Singleton<InGameManager>
 
     public void GoToTitle()
     {
-        DOTween.KillAll();
-        Cursor.visible = true;
-        Time.timeScale = 1;
         PoolManager.Instance.DisableAllObjects();
-        
+
         TransitionManager.Instance.LoadScene(SceneType.Title);
-        
+
         TransitionManager.Instance.TransitionFadeOut();
     }
 
@@ -242,7 +260,7 @@ public class InGameManager : Singleton<InGameManager>
     private void CameraMove()
     {
         Vector3 pos = Player.Instance.transform.position - cameraDistance;
-        GameManager.Instance.MainCamera.transform.position = new Vector3(Mathf.Clamp(pos.x, minPos.x*0.698f, maxPos.x * 0.698f), Mathf.Clamp(pos.y, minPos.y * 0.773f, maxPos.y * 0.773f), pos.z);
+        GameManager.Instance.MainCamera.transform.position = new Vector3(Mathf.Clamp(pos.x, minPos.x * 0.698f, maxPos.x * 0.698f), Mathf.Clamp(pos.y, minPos.y * 0.773f, maxPos.y * 0.773f), pos.z);
     }
 
     public Vector3 GetPosInMap(Vector3 vector, float radius)
@@ -252,7 +270,9 @@ public class InGameManager : Singleton<InGameManager>
 
     private void EnemyCreate()
     {
-        enemyDuration += Time.deltaTime + Time.deltaTime * 0.002f * enemyPower/2;
+        if (isBossSummon && !isBossLiving) return;
+
+        enemyDuration += Time.deltaTime + Mathf.Min(Time.deltaTime, Time.deltaTime * 0.002f * enemyPower / 2);
         if (enemyDuration >= enemyCoolTime)
         {
             enemyDuration -= enemyCoolTime;
@@ -260,8 +280,8 @@ public class InGameManager : Singleton<InGameManager>
             GameObject obj = PoolManager.Instance.Init("Enemy");
             obj.transform.position = Player.Instance.transform.position + (Vector3)Random.insideUnitCircle.normalized * 15;
             Enemy enemy = obj.GetComponent<Enemy>();
-            enemy.stat.damage = 5 + 0.01f * enemyPower/2;
-            enemy.stat.maxHp = 10 + 0.03f * enemyPower/2;
+            enemy.stat.damage = 5 + 0.01f * enemyPower / 2;
+            enemy.stat.maxHp = 10 + 0.03f * enemyPower / 2;
             enemy.stat.hp = enemy.stat.maxHp;
         }
     }
@@ -272,7 +292,7 @@ public class InGameManager : Singleton<InGameManager>
     {
         var chooseItems = new List<Item>();
         var itemList = new List<Item>();
-        List<Item> upgradeItemList = Player.Instance.GetInven().FindAll(item => item.CanGet());
+        List<Item> upgradeItemList = Player.Instance.GetInventory().FindAll(item => item.CanGet());
         foreach (Item item in ResourcesManager.Instance.GetAllItems())
             if (item.CanGet())
                 itemList.Add(item);
@@ -297,7 +317,7 @@ public class InGameManager : Singleton<InGameManager>
             chooseItems.Add(addItem);
             itemList.Remove(addItem);
         }
-        
+
         UIManager.Instance.StartChooseItem(chooseItems);
     }
 
@@ -335,7 +355,7 @@ public class InGameManager : Singleton<InGameManager>
         stage++;
 
         Player.Instance.stat.hp = Player.Instance.stat.maxHp;
-        
+
         MapSetting();
 
         StartCoroutine(CarIntro());

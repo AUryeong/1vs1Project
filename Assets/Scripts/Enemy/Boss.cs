@@ -6,8 +6,10 @@ public class Boss : Enemy
 {
     protected override void Update()
     {
+        if (!InGameManager.Instance.isGaming) return;
+        
         base.Update();
-        if (!dying)
+        if (!Dying)
             LiveUpdate(Time.deltaTime);
     }
 
@@ -21,9 +23,16 @@ public class Boss : Enemy
         UIManager.Instance.UpdateBossHp(stat.hp / stat.maxHp);
     }
 
-    protected override void Die()
+    public override void Die()
     {
         base.Die();
+        for (int i = 0; i < 5; i++)
+        {
+            var exp = PoolManager.Instance.Init("Exp").GetComponent<Exp>();
+
+            exp.transform.position = transform.position + (Vector3)(Random.insideUnitCircle * 5);
+            exp.exp = (Random.Range(0.5f, 1.5f) * stat.maxHp + stat.damage) * 0.25f;
+        }
         InGameManager.Instance.DieBoss();
     }
 }

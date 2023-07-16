@@ -144,7 +144,7 @@ public class Player : Unit
             item.OnKill(enemy);
     }
 
-    public List<Item> GetInven()
+    public List<Item> GetInventory()
     {
         return new List<Item>(items);
     }
@@ -199,8 +199,12 @@ public class Player : Unit
             InGameManager.Instance.ShowInt((int)healAmount, transform.position, healTextColor);
     }
 
-    private void TakeDamage(float damage, bool invAttack = false, bool isSkipText = false)
+    public void TakeDamage(float damage, bool invAttack = false, bool isSkipText = false)
     {
+        if (hurtInv || stat.hp <= 0) return;
+        
+        hurtInv = true;
+        
         if (invAttack)
         {
             if (!isSkipText)
@@ -219,6 +223,9 @@ public class Player : Unit
         UIManager.Instance.UpdateHp(stat.hp / (stat.maxHp / 100 * defaultStat.maxHp));
         if (!isSkipText)
             InGameManager.Instance.ShowInt((int)damage, transform.position, hitTextColor);
+
+        spriteRenderer.DOFade(hitFadeInAlpha, hitFadeTime)
+            .OnComplete(() => spriteRenderer.DOFade(hitFadeOutAlpha, hitFadeTime).OnComplete(() => hurtInv = false));
     }
 
     protected override void OnTriggerEnter2D(Collider2D collider2D)
@@ -247,7 +254,7 @@ public class Player : Unit
 
         foreach (Enemy enemy in collisionEnemyList.ToArray())
         {
-            if (enemy == null || !enemy.gameObject.activeSelf || enemy.dying) return;
+            if (enemy == null || !enemy.gameObject.activeSelf || enemy.Dying) return;
 
             if (Random.Range(0f, 100f) <= stat.evade)
             {
@@ -255,16 +262,12 @@ public class Player : Unit
                 return;
             }
 
-            hurtInv = true;
-
             bool invAttack = false;
             foreach (Item item in items)
                 if (item.OnHit(enemy))
                     invAttack = true;
+            
             TakeDamage(enemy.GetDamage(), invAttack);
-
-            spriteRenderer.DOFade(hitFadeInAlpha, hitFadeTime)
-                .OnComplete(() => spriteRenderer.DOFade(hitFadeOutAlpha, hitFadeTime).OnComplete(() => hurtInv = false));
         }
     }
 

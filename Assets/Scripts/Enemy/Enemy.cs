@@ -1,11 +1,10 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
 public class Enemy : Unit
 {
-    public bool dying
+    public bool Dying
     {
         get;
         private set;
@@ -24,7 +23,7 @@ public class Enemy : Unit
     {
         stat.hp = stat.maxHp;
         spriteRenderer.color = Color.white;
-        dying = false;
+        Dying = false;
     }
 
     protected virtual void Update()
@@ -32,7 +31,7 @@ public class Enemy : Unit
         if (!InGameManager.Instance.isGaming) return;
         
         float deltaTime = Time.deltaTime;
-        if (!dying)
+        if (!Dying)
         {
             Move(deltaTime);
         }
@@ -57,19 +56,19 @@ public class Enemy : Unit
 
     protected virtual void OnHurt(Projectile projectile, bool isSkipHitable = false)
     {
-        if (dying) return;
+        if (Dying) return;
         if (!isSkipHitable && !projectile.isHitable) return;
 
         projectile.OnHit(this);
 
         OnHurt(projectile.GetDamage(Player.Instance.GetDamage()));
 
-        if (dying)
+        if (Dying)
             projectile.OnKill();
     }
     public virtual void OnHurt(float damage, bool isCanEvade = true, bool isSkipText = false)
     {
-        if (dying) return;
+        if (Dying) return;
 
         if (isCanEvade)
             if (Random.Range(0f, 100f) <= stat.evade)
@@ -94,12 +93,12 @@ public class Enemy : Unit
         Die();
     }
 
-    protected virtual void Die()
+    public virtual void Die()
     {
         SoundManager.Instance.PlaySound("enemy", SoundType.Se, 0.4f);
         SoundManager.Instance.PlaySound("enemy 1", SoundType.Se, 0.5f);
 
-        dying = true;
+        Dying = true;
         InGameManager.Instance.OnKill(this);
         Player.Instance.OnKill(this);
 
@@ -112,11 +111,11 @@ public class Enemy : Unit
 
     protected override void OnTriggerEnter2D(Collider2D collider2D)
     {
-        if (dying) return;
+        if (Dying) return;
         if (collider2D == null) return;
         if (!InGameManager.Instance.isGaming) return;
 
-        else if (collider2D.CompareTag("Projectile"))
+        if (collider2D.CompareTag("Projectile"))
             OnHurt(collider2D.GetComponent<Projectile>());
     }
 

@@ -1,17 +1,19 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
+    [SerializeField] private Image itemIcon;
     [SerializeField] private TextMeshProUGUI itemName;
     [SerializeField] private TextMeshProUGUI itemLore;
-    public RectTransform RectTransform
+
+    private RectTransform RectTransform
     {
         get;
-        private set;
+        set;
     }
     private Item item;
     public Item Item
@@ -23,6 +25,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         set
         {
             item = value;
+            itemIcon.sprite = item.ItemIcon;
             itemName.text = "[ " + item.GetName() + " ]";
             itemLore.text = item.GetLore();
         }
