@@ -113,14 +113,13 @@ public class InGameManager : Singleton<InGameManager>
     {
         isGaming = false;
         Vector3 playerPos = Player.Instance.transform.position;
-        PoolManager.Instance.DisableObjects("Enemy");
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
 
         carImage.gameObject.SetActive(true);
         carImage.transform.position = new Vector3(playerPos.x + 16, playerPos.y, playerPos.y);
         carImage.transform.DOMoveX(playerPos.x, 1f).SetEase(Ease.OutQuad);
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2);
 
         Player.Instance.gameObject.SetActive(false);
 
@@ -129,10 +128,10 @@ public class InGameManager : Singleton<InGameManager>
         carImage.transform.DOMoveX(playerPos.x - 24, 3f).SetEase(Ease.InBack).OnComplete(() =>
         {
             carImage.gameObject.SetActive(false);
-            TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () =>
+            TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade, () =>
             {
                 UIManager.Instance.ScoreSetting();
-                TransitionManager.Instance.TransitionFadeOut();
+                TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade);
             });
         });
     }
@@ -143,9 +142,9 @@ public class InGameManager : Singleton<InGameManager>
         UIManager.Instance.UpdateTimer(timer);
         if (!isBossSummon)
         {
-            if (stage == 1 && timer >= 100)
+            if (stage == 1 && timer >= 10)
             {
-                BossSummon();
+                StartCoroutine(CarOutro());
             }
 
             if (stage == 2 && timer - lastTimer >= 200)
@@ -280,8 +279,8 @@ public class InGameManager : Singleton<InGameManager>
             GameObject obj = PoolManager.Instance.Init("Enemy");
             obj.transform.position = Player.Instance.transform.position + (Vector3)Random.insideUnitCircle.normalized * 15;
             Enemy enemy = obj.GetComponent<Enemy>();
-            enemy.stat.damage = 5 + 0.01f * enemyPower / 2;
-            enemy.stat.maxHp = 10 + 0.03f * enemyPower / 2;
+            enemy.stat.damage = 5 + 0.005f * enemyPower;
+            enemy.stat.maxHp = 10 + 0.05f * enemyPower;
             enemy.stat.hp = enemy.stat.maxHp;
         }
     }
@@ -350,6 +349,9 @@ public class InGameManager : Singleton<InGameManager>
 
     public void NextStage()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
+        TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade);
+            
         PoolManager.Instance.DisableAllObjects();
         UIManager.Instance.NextStageSetting();
         stage++;

@@ -36,6 +36,7 @@ public class Player : Unit
     public int lv = 0;
     private float exp = 0;
     public float maxExp = 100f;
+    public float xpGetRadius = 100f;
 
     public float Exp
     {

@@ -1,4 +1,4 @@
-﻿public class Item_Daybreak : Item
+﻿public class Item_Simple : Item
 {
     private const float critPercentDecrease = 30;
     private const float damagePercentIncrease = 30;

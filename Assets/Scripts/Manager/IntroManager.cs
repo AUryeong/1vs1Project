@@ -68,6 +68,7 @@ public class IntroManager : MonoBehaviour
 
     private void GoToTitle()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade, () =>
         {
             TransitionManager.Instance.LoadScene(SceneType.Title);

@@ -22,8 +22,7 @@ public class TransitionManager : Singleton<TransitionManager>
 {
     protected override bool IsDontDestroying => true;
 
-    [Header("화면 연출")]
-    private bool isSceneFadeInTransitioning = false;
+    [Header("화면 연출")] private bool isSceneFadeInTransitioning = false;
     private bool isSceneFadeOutTransitioning = false;
 
     public SpriteRenderer background;
@@ -65,6 +64,8 @@ public class TransitionManager : Singleton<TransitionManager>
 
     public void TransitionFadeIn(TransitionType type = TransitionType.Square, Action action = null)
     {
+        var pos = GameManager.Instance.MainCamera.transform.position;
+        transform.position = new Vector3(pos.x, pos.y, 0);
         if (type == TransitionType.Fade)
         {
             StopCoroutine();
@@ -91,6 +92,8 @@ public class TransitionManager : Singleton<TransitionManager>
 
     public void TransitionFadeOut(TransitionType type = TransitionType.Square, Action action = null)
     {
+        var pos = GameManager.Instance.MainCamera.transform.position;
+        transform.position = new Vector3(pos.x, pos.y, 0);
         if (type == TransitionType.Fade)
         {
             StopCoroutine();
@@ -118,7 +121,7 @@ public class TransitionManager : Singleton<TransitionManager>
         });
     }
 
-    IEnumerator FadeIn(Action action = null)
+    private IEnumerator FadeIn(Action action = null)
     {
         blackBackground.gameObject.SetActive(true);
         blackBackground.color = blackBackground.color.FadeChange(1);
@@ -133,7 +136,7 @@ public class TransitionManager : Singleton<TransitionManager>
         action?.Invoke();
     }
 
-    IEnumerator FadeOut(Action action = null)
+    private IEnumerator FadeOut(Action action = null)
     {
         blackBackground.gameObject.SetActive(true);
         blackBackground.color = blackBackground.color.FadeChange(0);

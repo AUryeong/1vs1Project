@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Exp : MonoBehaviour
 {
+    private BoxCollider2D boxCollider2D;
+    
     public float exp = 0;
     private bool isGot = false;
     private float duration;
@@ -11,10 +13,17 @@ public class Exp : MonoBehaviour
     private Vector3 startPos;
     private Vector3 middlePos;
 
+    private void Awake()
+    {
+        boxCollider2D = GetComponent<BoxCollider2D>();
+    }
+
     private void OnEnable()
     {
         isGot = false;
         duration = 0;
+        
+        boxCollider2D.size = 5 * Player.Instance.xpGetRadius / 100f * Vector2.one;
     }
 
     private void Update()

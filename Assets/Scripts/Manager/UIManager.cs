@@ -134,6 +134,7 @@ public class UIManager : Singleton<UIManager>
 
     private void SettingSetting()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         settingWindow.gameObject.SetActive(true);
         settingWindow.rectTransform.DOKill();
         settingWindow.rectTransform.localScale = Vector3.zero;
@@ -143,6 +144,7 @@ public class UIManager : Singleton<UIManager>
 
     private void SettingExit()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         settingWindow.rectTransform.DOKill();
         settingWindow.rectTransform.localScale = Vector3.one;
         
@@ -181,6 +183,12 @@ public class UIManager : Singleton<UIManager>
     public void ScoreSetting()
     {
         scoreBackground.gameObject.SetActive(true);
+        scoreForeground.rectTransform.DOAnchorPosY(-703, 2f).SetUpdate(true).From();
+        scoreCharacter.rectTransform.DOAnchorPosX(-1338, 1.5f).SetEase(Ease.OutBack).SetUpdate(true).From();
+        scoreEnemyCount.rectTransform.DOAnchorPosY(752, 2.5f).SetUpdate(true).From();
+        scoreWindow.rectTransform.DOAnchorPosX(1445, 1.5f).SetEase(Ease.OutBack).SetUpdate(true).From();
+        scoreLvText.rectTransform.DOScale(0, 1.7f).SetUpdate(true).From();
+        scoreNextStageButton.image.rectTransform.DOAnchorPosY(-1580f, 3.5f).From();
         scoreEnemyText.text = InGameManager.Instance.killEnemyCount.ToString();
         scoreScoreText.text = InGameManager.Instance.Score + "Á¡";
         scoreLvText.text = "Lv." + Player.Instance.lv;
@@ -223,6 +231,7 @@ public class UIManager : Singleton<UIManager>
 
     private void EscExit()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         InGameManager.Instance.isGaming = true;
         if(!itemSlotActivating) 
             Time.timeScale = 1;
@@ -349,6 +358,7 @@ public class UIManager : Singleton<UIManager>
 
     private void GameExitButton()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade, () =>
         {
             SoundManager.Instance.PlaySound("button select");

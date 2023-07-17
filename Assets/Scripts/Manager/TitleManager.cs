@@ -51,6 +51,7 @@ public class TitleManager : MonoBehaviour
 
     public void GameStart()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () => 
         {
             SceneManager.LoadScene("InGame");
@@ -59,6 +60,7 @@ public class TitleManager : MonoBehaviour
 
     public void Back()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () =>
         {
             title.gameObject.SetActive(true);
@@ -72,6 +74,7 @@ public class TitleManager : MonoBehaviour
 
     public void HowToPlay()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () =>
         {
             title.gameObject.SetActive(false);
@@ -82,6 +85,7 @@ public class TitleManager : MonoBehaviour
     }
     public void Credit()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () =>
         {
             title.gameObject.SetActive(false);
@@ -101,6 +105,7 @@ public class TitleManager : MonoBehaviour
 
     public void Setting()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () =>
         {
             title.gameObject.SetActive(false);
@@ -120,6 +125,7 @@ public class TitleManager : MonoBehaviour
 
     public void GameEnd()
     {
+        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, Application.Quit);
     }
 }

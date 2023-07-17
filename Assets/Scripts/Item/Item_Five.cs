@@ -1,4 +1,4 @@
-﻿public class Item_GodBless : Item
+﻿public class Item_Five : Item
 {
     private float duration;
     private float coolTime;

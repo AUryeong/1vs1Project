@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Item_AreaDamage : Item
+public class Item_Tack : Item
 {
     private float duration = 0;
     private const float coolTime = 0.3f;
