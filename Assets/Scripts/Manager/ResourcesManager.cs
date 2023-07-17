@@ -32,7 +32,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     private void ReadItem()
     {
-        foreach (string line in Resources.Load<TextAsset>("Item/ItemList").text.Split('\n'))
+        foreach (string line in Resources.Load<TextAsset>(nameof(Item) + "/ItemList").text.Split('\n'))
         {
             string[] texts = line.Split(',');
 
@@ -57,10 +57,10 @@ public class ResourcesManager : Singleton<ResourcesManager>
             {
                 // 이후 업그레이드가 없는 것에 대한 예외 처리
                 if (string.IsNullOrWhiteSpace(texts[i + 2])) break;
-                lore.Add(texts[i + 2]);
+                lore.Add(texts[i + 2].Replace("\"", ""));
             }
 
-            item.Init(itemName, lore.ToArray(), lore.Count - 1, itemIcon.ContainsKey(itemName) ? itemIcon[itemName] : null);
+            item.Init(itemName, lore.ToArray(), lore.Count - 1, itemIcon.ContainsKey(codeItemName) ? itemIcon[codeItemName] : null);
 
             items.Add(codeItemName, item);
         }

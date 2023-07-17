@@ -231,7 +231,6 @@ public class UIManager : Singleton<UIManager>
 
     private void EscExit()
     {
-        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         InGameManager.Instance.isGaming = true;
         if(!itemSlotActivating) 
             Time.timeScale = 1;

@@ -142,9 +142,9 @@ public class InGameManager : Singleton<InGameManager>
         UIManager.Instance.UpdateTimer(timer);
         if (!isBossSummon)
         {
-            if (stage == 1 && timer >= 10)
+            if (stage == 1 && timer >= 100)
             {
-                StartCoroutine(CarOutro());
+                BossSummon();
             }
 
             if (stage == 2 && timer - lastTimer >= 200)
@@ -271,16 +271,18 @@ public class InGameManager : Singleton<InGameManager>
     {
         if (isBossSummon && !isBossLiving) return;
 
-        enemyDuration += Time.deltaTime + Mathf.Min(Time.deltaTime, Time.deltaTime * 0.002f * enemyPower / 2);
+        enemyDuration += Time.deltaTime + Mathf.Min(Time.deltaTime, Time.deltaTime * 0.001f * enemyPower);
         if (enemyDuration >= enemyCoolTime)
         {
             enemyDuration -= enemyCoolTime;
             enemyPower++;
-            GameObject obj = PoolManager.Instance.Init("Enemy");
+            
+            var obj = PoolManager.Instance.Init("Enemy");
             obj.transform.position = Player.Instance.transform.position + (Vector3)Random.insideUnitCircle.normalized * 15;
-            Enemy enemy = obj.GetComponent<Enemy>();
+            
+            var enemy = obj.GetComponent<Enemy>();
             enemy.stat.damage = 5 + 0.005f * enemyPower;
-            enemy.stat.maxHp = 10 + 0.05f * enemyPower;
+            enemy.stat.maxHp = 10 + 0.02f * enemyPower;
             enemy.stat.hp = enemy.stat.maxHp;
         }
     }

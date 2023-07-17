@@ -64,11 +64,12 @@ public class Player : Unit
 
     private readonly Color hitTextColor = new Color(255 / 255f, 66 / 255f, 66 / 255f);
     private readonly Color healTextColor = new Color(101 / 255f, 255 / 255f, 76 / 255f);
-    private readonly float hitFadeInAlpha = 0.8f;
-    private readonly float hitFadeOutAlpha = 1f;
-    private readonly float hitFadeTime = 0.1f;
+    
+    private const float hitFadeInAlpha = 0.8f;
+    private const float hitFadeOutAlpha = 1f;
+    private const float hitFadeTime = 0.1f;
 
-    private readonly float damageRandomPercent = 10;
+    private const float damageRandomPercent = 10;
 
     [HideInInspector] public List<Enemy> collisionEnemyList = new List<Enemy>();
 
@@ -300,17 +301,7 @@ public class Player : Unit
         {
             speedY -= stat.speed / 100 * defaultStat.speed;
         }
-
-        if (speedX == 0 && speedY == 0)
-        {
-            animator.SetBool(isWalkingHash, false);
-            animator.speed = 1;
-        }
-        else
-        {
-            animator.SetBool(isWalkingHash, true);
-            animator.speed = stat.speed / 100 * defaultStat.speed * animatorScaleSpeed;
-        }
+        animator.SetBool(isWalkingHash, speedX != 0 || speedY != 0);
 
         rigid.velocity = new Vector2(speedX, speedY );
 
