@@ -181,7 +181,7 @@ public class CartoonManager : Singleton<CartoonManager>
 
     public void CartoonPlay(int index, Action cartoonEvent = null)
     {
-        cutSceneParent.gameObject.SetActive(false);
+        cutSceneParent.gameObject.SetActive(true);
         
         endEvent = cartoonEvent;
         cutScene = cutScenes[index];

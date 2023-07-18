@@ -205,12 +205,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stat:
-    speed: 4
-    hp: 1000
-    maxHp: 1000
+    speed: 6
+    hp: 2000
+    maxHp: 2000
     crit: 0
     critDmg: 0
-    damage: 1
+    damage: 15
     evade: 0
   laserAnimator: {fileID: 8595110784656349563}
   whiteShootParticle: {fileID: 8595110783789732660}
@@ -5150,7 +5150,7 @@ Transform:
   m_GameObject: {fileID: 8595110784656349565}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -1.59, y: 0.128, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 1130253965993642113}
   m_RootOrder: 1

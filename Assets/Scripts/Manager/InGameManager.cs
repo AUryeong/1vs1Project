@@ -150,7 +150,7 @@ public class InGameManager : Singleton<InGameManager>
                 BossSummon();
             }
 
-            if (stage == 2 && timer - lastTimer >= 240)
+            if (stage == 2 && timer - lastTimer >= 180)
             {
                 BossSummon();
             }
@@ -165,18 +165,19 @@ public class InGameManager : Singleton<InGameManager>
                         StartCoroutine(CarOutro());
                         break;
                     case 2:
-                        TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade, () =>
+                        Time.timeScale = 0;
+                        isGaming = false;
+                        TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade, () =>
                         {
-                            Time.timeScale = 0;
-                            isGaming = false;
-
+                            SoundManager.Instance.PlaySound("title", SoundType.BGM);
+                    
                             CartoonManager.Instance.CartoonPlay(0, () =>
                                 CartoonManager.Instance.CartoonPlay(1, () =>
                                     CartoonManager.Instance.CartoonPlay(2, () =>
                                         TransitionManager.Instance.LoadScene(SceneType.Title))
                                 ));
 
-                            TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade);
+                            TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade);
                         });
                         break;
                 }
@@ -224,6 +225,7 @@ public class InGameManager : Singleton<InGameManager>
         Time.timeScale = 0;
         isGaming = false;
         UIManager.Instance.GameOver();
+        SoundManager.Instance.PlaySound("fail", SoundType.Se, 0.8f);
     }
 
     public void GoToTitle()
@@ -240,7 +242,7 @@ public class InGameManager : Singleton<InGameManager>
         killEnemyCount++;
         UIManager.Instance.UpdateKillEnemyCount(killEnemyCount);
 
-        var exp = PoolManager.Instance.Init("Exp").GetComponent<Exp>();
+        var exp = Random.Range(0, 100) == 0 ? PoolManager.Instance.Init("BigExp").GetComponent<Exp>() : PoolManager.Instance.Init("Exp").GetComponent<Exp>();
 
         exp.transform.position = enemy.transform.position;
         exp.exp = (Random.Range(expRandomMin, expRandomMax) * enemy.stat.maxHp + enemy.stat.damage) * 1.3f;
@@ -287,6 +289,7 @@ public class InGameManager : Singleton<InGameManager>
             enemy.stat.damage = 5 * stage + 0.005f * enemyPower;
             enemy.stat.maxHp = 10 * stage + 0.03f * enemyPower;
             enemy.stat.hp = enemy.stat.maxHp;
+            enemy.stat.speed = 0.5f * Random.Range(0.6f, 1.4f);
         }
     }
 

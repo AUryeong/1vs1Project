@@ -21,7 +21,7 @@ public class CarBoss : Boss
             isRiding = true;
 
             direction = (Direction)Random.Range(0, 2);
-            spriteRenderer.flipX = direction == Direction.Right;
+            transform.localScale = new Vector3(direction == Direction.Right ? -1 : 1, 1, 1);
 
             warning.DOKill();
             warning.color =new Color(1,0,0,0.25f);
@@ -58,5 +58,4 @@ public class CarBoss : Boss
             warning.transform.position = new Vector3(0, transform.position.y-0.6f, transform.position.z);
         }
     }
-
 }

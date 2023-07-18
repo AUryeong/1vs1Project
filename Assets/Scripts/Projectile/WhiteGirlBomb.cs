@@ -59,6 +59,7 @@ public class WhiteGirlBomb : MonoBehaviour
 
         if (result != null && result.Count > 0)
             foreach (var player in result)
-                player.GetComponent<Player>().TakeDamage(stat.damage / 2);
+                if (player.CompareTag("Player"))
+                    player.GetComponent<Player>().TakeDamage(stat.damage / 2);
     }
 }

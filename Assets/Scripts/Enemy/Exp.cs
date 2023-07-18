@@ -4,8 +4,8 @@ public class Exp : MonoBehaviour
 {
     private BoxCollider2D boxCollider2D;
     
-    public float exp = 0;
-    private bool isGot = false;
+    public float exp;
+    private bool isGot;
     private float duration;
 
     private const float getDuration = 0.75f;
@@ -31,6 +31,14 @@ public class Exp : MonoBehaviour
         Move();
     }
 
+    protected virtual void Get()
+    {
+        
+        gameObject.SetActive(false);
+        SoundManager.Instance.PlaySound("exp", SoundType.Se, 2f, 2f);
+        Player.Instance.Exp += exp;
+    }
+
     private void Move()
     {
         if (!isGot) return;
@@ -38,11 +46,9 @@ public class Exp : MonoBehaviour
         duration += Time.deltaTime;
         transform.position = Utility.Beizer(startPos, middlePos, Player.Instance.transform.position, duration / getDuration);
         
-        if (!(duration >= getDuration)) return;
-        
-        gameObject.SetActive(false);
-        SoundManager.Instance.PlaySound("exp", SoundType.Se, 2f, 2f);
-        Player.Instance.Exp += exp;
+        if (duration < getDuration) return;
+
+        Get();
     }
 
     public void OnGet()

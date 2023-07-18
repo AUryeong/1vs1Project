@@ -75,6 +75,12 @@ public class Player : Unit
 
     #endregion
 
+    public bool IsMoving
+    {
+        get;
+        private set;
+    }
+
     #region 애니메이션 변수
 
     [SerializeField] protected SpriteRenderer gun;
@@ -83,7 +89,6 @@ public class Player : Unit
     protected Animator animator;
     protected Rigidbody2D rigid;
     
-    private readonly float animatorScaleSpeed = 0.2f;
     private static readonly int isWalkingHash = Animator.StringToHash("isWalking");
 
     #endregion
@@ -206,6 +211,9 @@ public class Player : Unit
         if (hurtInv || stat.hp <= 0) return;
         
         hurtInv = true;
+
+        spriteRenderer.DOFade(hitFadeInAlpha, hitFadeTime)
+            .OnComplete(() => spriteRenderer.DOFade(hitFadeOutAlpha, hitFadeTime).OnComplete(() => hurtInv = false));
         
         if (invAttack)
         {
@@ -225,9 +233,6 @@ public class Player : Unit
         UIManager.Instance.UpdateHp(stat.hp / (stat.maxHp / 100 * defaultStat.maxHp));
         if (!isSkipText)
             InGameManager.Instance.ShowInt((int)damage, transform.position, hitTextColor);
-
-        spriteRenderer.DOFade(hitFadeInAlpha, hitFadeTime)
-            .OnComplete(() => spriteRenderer.DOFade(hitFadeOutAlpha, hitFadeTime).OnComplete(() => hurtInv = false));
     }
 
     protected override void OnTriggerEnter2D(Collider2D collider2D)
@@ -302,6 +307,7 @@ public class Player : Unit
             speedY -= stat.speed / 100 * defaultStat.speed;
         }
         animator.SetBool(isWalkingHash, speedX != 0 || speedY != 0);
+        IsMoving = speedX != 0 || speedY != 0;
 
         rigid.velocity = new Vector2(speedX, speedY );
 

@@ -1,7 +1,4 @@
-﻿using DG.Tweening;
-using Sirenix.OdinInspector.Editor.TypeSearch;
-using System.Drawing;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Item_SketchBook : Item
 {

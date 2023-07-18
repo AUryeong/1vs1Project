@@ -5,6 +5,6 @@ public class Player_Flip3 : Player
     protected override void Start()
     {
         base.Start();
-        AddItem(ResourcesManager.Instance.GetItem("Bp153"));
+        AddItem(ResourcesManager.Instance.GetItem("Flip3"));
     }
 }

@@ -44,13 +44,14 @@ public class WhiteGirlBoss : Boss
             if (shootAttackDuration >= 1)
             {
                 isShooting = false;
-                shootAttackDuration = 0;;
+                shootAttackDuration = 0;
+                
                 animator.SetBool(animShootingHash, false);
 
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     var bomb = PoolManager.Instance.Init("WhiteGirlBomb").GetComponent<WhiteGirlBomb>();
-                    bomb.OnCreated((transform.position + (Vector3)(Random.insideUnitCircle*20)).ZChange(), stat);
+                    bomb.OnCreated((transform.position + (Vector3)(Random.insideUnitCircle * 20)).ZChange(), stat);
                 }
             }
         }
@@ -74,10 +75,11 @@ public class WhiteGirlBoss : Boss
                 {
                     layerMask = LayerMask.GetMask("Player")
                 }, result);
-                
-                if (result != null && result.Count > 0)
+
+                if (result.Count > 0)
                     foreach (var player in result)
-                        player.GetComponent<Player>().TakeDamage(stat.damage / 2);
+                        if (player.CompareTag("Player"))
+                            player.GetComponent<Player>().TakeDamage(stat.damage / 2);
             }
         }
         else
@@ -102,7 +104,6 @@ public class WhiteGirlBoss : Boss
 
                 laserAnimator.gameObject.SetActive(true);
                 laserAnimator.SetBool(animShootingHash, true);
-                return;
             }
         }
     }
@@ -118,6 +119,7 @@ public class WhiteGirlBoss : Boss
                 Move(Time.deltaTime);
         }
     }
+
     protected override void Move(float deltaTime)
     {
         transform.Translate(stat.speed * deltaTime * (Player.Instance.transform.position - transform.position).normalized);

@@ -35,6 +35,7 @@ public class IntroManager : MonoBehaviour
 
     private void Start()
     {
+    SoundManager.Instance.PlaySound("intro", SoundType.BGM);
         StartCoroutine(Intro());
     }
 
@@ -49,7 +50,7 @@ public class IntroManager : MonoBehaviour
             dialogText.text = text.Substring(0, i+1);
             yield return wait;
         }
-        yield return wait;
+        yield return new WaitForSeconds(1f);
         while (dialogText.color.a > 0)
         {
             dialogText.color = new Color(dialogText.color.r, dialogText.color.g, dialogText.color.b,

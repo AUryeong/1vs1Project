@@ -184,6 +184,7 @@ public class UIManager : Singleton<UIManager>
 
     public void ScoreSetting()
     {
+        SoundManager.Instance.PlaySound("score");
         scoreBackground.gameObject.SetActive(true);
         
         scoreEnemyText.text = InGameManager.Instance.killEnemyCount.ToString();

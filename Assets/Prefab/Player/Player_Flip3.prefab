@@ -178,7 +178,7 @@ GameObject:
   - component: {fileID: 9211091419117971937}
   - component: {fileID: 9211091419117971936}
   - component: {fileID: 9211091419117971950}
-  - component: {fileID: 1479205689389394134}
+  - component: {fileID: 8249988695022482524}
   m_Layer: 6
   m_Name: Player_Flip3
   m_TagString: Untagged
@@ -335,7 +335,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &1479205689389394134
+--- !u!114 &8249988695022482524
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -344,7 +344,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 9211091419117971951}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae9f1da77c844df6abd94afc5c6de860, type: 3}
+  m_Script: {fileID: 11500000, guid: cc6a44e005ba4ef1b8ee5a43c4375a4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   stat:
