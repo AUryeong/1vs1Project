@@ -1,5 +1,4 @@
 using System.Collections;
-using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
@@ -54,7 +53,7 @@ public class TitleManager : MonoBehaviour
         SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         TransitionManager.Instance.TransitionFadeIn(TransitionType.Square, () => 
         {
-            SceneManager.LoadScene("InGame");
+            TransitionManager.Instance.LoadScene(SceneType.Character);
         });
     }
 

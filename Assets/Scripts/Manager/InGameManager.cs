@@ -28,7 +28,9 @@ public class InGameManager : Singleton<InGameManager>
     private float lastTimer;
 
     [Header("적")] public int killEnemyCount;
-    private const float enemyCoolTime = 0.5f;
+    private float enemyCoolTime;
+    private const float firstEnemyCoolTime = 0.75f;
+    private const float secondEnemyCoolTime = 0.6f;
     private float enemyDuration = 0;
     [SerializeField] private float enemyPower = 0;
 
@@ -45,7 +47,7 @@ public class InGameManager : Singleton<InGameManager>
     [Header("스테이지")] public int stage;
     [SerializeField] private SpriteRenderer[] stageBackgrounds;
 
-    [Header("캐릭터")] [SerializeField] private Dictionary<CharacterType, Player> players;
+    [Header("캐릭터")][SerializeField] private Dictionary<CharacterType, Player> players;
 
     public int Score => Mathf.RoundToInt(killEnemyCount * 3 + (stage - 1) * 1000 + timer);
 
@@ -54,10 +56,11 @@ public class InGameManager : Singleton<InGameManager>
         stage = 1;
         timer = 0;
         killEnemyCount = 0;
+        enemyCoolTime = firstEnemyCoolTime;
 
         MapSetting();
         Player.Instance.gameObject.SetActive(false);
-        
+
         TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade, () => StartCoroutine(CarIntro()));
     }
 
@@ -142,19 +145,19 @@ public class InGameManager : Singleton<InGameManager>
         UIManager.Instance.UpdateTimer(timer);
         if (!isBossSummon)
         {
-            if (stage == 1 && timer >= 100)
+            if (stage == 1 && timer >= 180)
             {
                 BossSummon();
             }
 
-            if (stage == 2 && timer - lastTimer >= 200)
+            if (stage == 2 && timer - lastTimer >= 240)
             {
                 BossSummon();
             }
         }
         else
         {
-            if (!isBossLiving && timer - lastTimer > 10)
+            if (!isBossLiving && timer - lastTimer > 5)
             {
                 switch (stage)
                 {
@@ -166,13 +169,13 @@ public class InGameManager : Singleton<InGameManager>
                         {
                             Time.timeScale = 0;
                             isGaming = false;
-                        
-                            CartoonManager.Instance.CartoonPlay(0, ()=>
+
+                            CartoonManager.Instance.CartoonPlay(0, () =>
                                 CartoonManager.Instance.CartoonPlay(1, () =>
-                                    CartoonManager.Instance.CartoonPlay(2,()=>
+                                    CartoonManager.Instance.CartoonPlay(2, () =>
                                         TransitionManager.Instance.LoadScene(SceneType.Title))
                                 ));
-                        
+
                             TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade);
                         });
                         break;
@@ -271,18 +274,18 @@ public class InGameManager : Singleton<InGameManager>
     {
         if (isBossSummon && !isBossLiving) return;
 
-        enemyDuration += Time.deltaTime + Mathf.Min(Time.deltaTime, Time.deltaTime * 0.001f * enemyPower);
-        if (enemyDuration >= enemyCoolTime)
+        enemyDuration += Time.deltaTime;
+        if (enemyDuration >= enemyCoolTime - enemyCoolTime * stage)
         {
             enemyDuration -= enemyCoolTime;
             enemyPower++;
-            
+
             var obj = PoolManager.Instance.Init("Enemy");
             obj.transform.position = Player.Instance.transform.position + (Vector3)Random.insideUnitCircle.normalized * 15;
-            
+
             var enemy = obj.GetComponent<Enemy>();
-            enemy.stat.damage = 5 + 0.005f * enemyPower;
-            enemy.stat.maxHp = 10 + 0.02f * enemyPower;
+            enemy.stat.damage = 5 * stage + 0.005f * enemyPower;
+            enemy.stat.maxHp = 10 * stage + 0.03f * enemyPower;
             enemy.stat.hp = enemy.stat.maxHp;
         }
     }
@@ -353,10 +356,10 @@ public class InGameManager : Singleton<InGameManager>
     {
         SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         TransitionManager.Instance.TransitionFadeIn(TransitionType.Fade);
-            
-        PoolManager.Instance.DisableAllObjects();
+
         UIManager.Instance.NextStageSetting();
         stage++;
+        enemyCoolTime = secondEnemyCoolTime;
 
         Player.Instance.stat.hp = Player.Instance.stat.maxHp;
 

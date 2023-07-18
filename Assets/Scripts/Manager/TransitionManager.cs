@@ -15,6 +15,7 @@ public enum SceneType
 {
     Intro,
     Title,
+    Character,
     InGame
 }
 

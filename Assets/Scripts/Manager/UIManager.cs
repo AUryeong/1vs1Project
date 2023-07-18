@@ -62,6 +62,8 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] private Slider sfxSlider;
     [SerializeField] private Button settingExitButton;
 
+    private bool isQuiting = false;
+
     [Header("캐릭별 이미지")]
     [SerializeField] private Dictionary<CharacterType, Sprite> sdSprites = new Dictionary<CharacterType, Sprite>();
     [SerializeField] private Dictionary<CharacterType, Sprite> ldSprites = new Dictionary<CharacterType, Sprite>();
@@ -183,15 +185,17 @@ public class UIManager : Singleton<UIManager>
     public void ScoreSetting()
     {
         scoreBackground.gameObject.SetActive(true);
+        
+        scoreEnemyText.text = InGameManager.Instance.killEnemyCount.ToString();
+        scoreScoreText.text = InGameManager.Instance.Score + "점";
+        scoreLvText.text = "Lv." + Player.Instance.lv;
+
         scoreForeground.rectTransform.DOAnchorPosY(-703, 2f).SetUpdate(true).From();
         scoreCharacter.rectTransform.DOAnchorPosX(-1338, 1.5f).SetEase(Ease.OutBack).SetUpdate(true).From();
         scoreEnemyCount.rectTransform.DOAnchorPosY(752, 2.5f).SetUpdate(true).From();
         scoreWindow.rectTransform.DOAnchorPosX(1445, 1.5f).SetEase(Ease.OutBack).SetUpdate(true).From();
         scoreLvText.rectTransform.DOScale(0, 1.7f).SetUpdate(true).From();
         scoreNextStageButton.image.rectTransform.DOAnchorPosY(-1580f, 3.5f).From();
-        scoreEnemyText.text = InGameManager.Instance.killEnemyCount.ToString();
-        scoreScoreText.text = InGameManager.Instance.Score + "점";
-        scoreLvText.text = "Lv." + Player.Instance.lv;
     }
 
     public void NextStageSetting()
@@ -357,6 +361,9 @@ public class UIManager : Singleton<UIManager>
 
     private void GameExitButton()
     {
+        if (isQuiting) return;
+        isQuiting = true;
+
         SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
         TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade, () =>
         {

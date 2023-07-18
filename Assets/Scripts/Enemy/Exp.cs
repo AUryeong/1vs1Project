@@ -23,7 +23,7 @@ public class Exp : MonoBehaviour
         isGot = false;
         duration = 0;
         
-        boxCollider2D.size = 5 * Player.Instance.xpGetRadius / 100f * Vector2.one;
+        boxCollider2D.size = 3 * Player.Instance.xpGetRadius / 100f * Vector2.one;
     }
 
     private void Update()

@@ -3,7 +3,25 @@ using UnityEngine;
 public class Item
 {
     private string name;
+    public string Name
+    {
+        get
+        {
+            if (Upgrade < 1)
+                return name;
+            return name + " LV." + Upgrade;
+        }
+    }
+
+
     private string[] lore;
+    public string Lore
+    {
+        get
+        {
+            return lore[Upgrade];
+        }
+    }
 
     //ºñ È¹µæÀº 0, È¹µæ ºÎÅÍ 1 ½ÃÀÛ
     public int Upgrade { get; private set; }
@@ -29,18 +47,6 @@ public class Item
     public virtual void OnReset()
     {
         Upgrade = 0;
-    }
-
-    public string GetName()
-    {
-        if (Upgrade < 1)
-            return name;
-        return name + " LV." + Upgrade;
-    }
-
-    public string GetLore()
-    {
-        return lore[Upgrade];
     }
 
     public virtual bool CanGet()

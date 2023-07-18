@@ -10,11 +10,7 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     [SerializeField] private TextMeshProUGUI itemName;
     [SerializeField] private TextMeshProUGUI itemLore;
 
-    private RectTransform RectTransform
-    {
-        get;
-        set;
-    }
+    private RectTransform rectTransform;
     private Item item;
     public Item Item
     {
@@ -26,24 +22,24 @@ public class ItemSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         {
             item = value;
             itemIcon.sprite = item.ItemIcon;
-            itemName.text = "[ " + item.GetName() + " ]";
-            itemLore.text = item.GetLore();
+            itemName.text = "[ " + item.Name + " ]";
+            itemLore.text = item.Lore;
         }
     }
 
     protected void Awake()
     {
-        RectTransform = GetComponent<RectTransform>();
+        rectTransform = GetComponent<RectTransform>();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        RectTransform.DOScale(Vector3.one * 1.2f, 0.5f).SetUpdate(true);
+        rectTransform.DOScale(Vector3.one * 1.25f, 0.3f).SetUpdate(true);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        RectTransform.DOScale(Vector3.one, 0.5f).SetUpdate(true);
+        rectTransform.DOScale(Vector3.one, 0.3f).SetUpdate(true);
     }
 
     public void OnPointerClick(PointerEventData eventData)

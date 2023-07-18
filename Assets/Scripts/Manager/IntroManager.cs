@@ -19,13 +19,18 @@ public class IntroManager : MonoBehaviour
     [SerializeField] private Button skipButton;
 
     private Vector2 carPos;
+    private bool isLoading = false;
 
     private void Awake()
     {
         carPos = car.rectTransform.anchoredPosition;
         
         skipButton.onClick.RemoveAllListeners();
-        skipButton.onClick.AddListener(GoToTitle);
+        skipButton.onClick.AddListener(()=>
+        {
+            SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
+            GoToTitle();
+        });
     }
 
     private void Start()
@@ -44,23 +49,23 @@ public class IntroManager : MonoBehaviour
             dialogText.text = text.Substring(0, i+1);
             yield return wait;
         }
-        wait = new WaitForSeconds(0.5f);
         yield return wait;
         while (dialogText.color.a > 0)
         {
             dialogText.color = new Color(dialogText.color.r, dialogText.color.g, dialogText.color.b,
-                dialogText.color.a - Time.deltaTime/2);
+                dialogText.color.a - Time.deltaTime);
             yield return null;
         }
         dialogText.color = new Color(dialogText.color.r, dialogText.color.g, dialogText.color.b, 0);
-        yield return wait;
+        yield return new WaitForSeconds(1f);
     }
 
     private IEnumerator Intro()
     {
         yield return StartCoroutine(Text("평화로웠을 대한민국,"));
         yield return StartCoroutine(Text("어느날 갑자기, 필기구들이 변하기 시작했다."));
-        yield return StartCoroutine(Text("지우개와 같은 필기구들이 사람같이 되어, 사람을 공격하기 시작한 것이다."));
+        yield return StartCoroutine(Text("지우개와 같은 필기구들이 사람급의 크기가 되어,"));
+        yield return StartCoroutine(Text("사람을 공격하기 시작한 것이다."));
         yield return StartCoroutine(Text("이러한 현상을 막고자 모나미에선 사람이 된 볼펜들을 투입한다."));
         yield return StartCoroutine(Text("이건 그 이야기이다."));
         GoToTitle();
@@ -68,7 +73,10 @@ public class IntroManager : MonoBehaviour
 
     private void GoToTitle()
     {
-        SoundManager.Instance.PlaySound("button", SoundType.Se, 2f);
+        if (isLoading) return;
+
+        isLoading = true;
+
         TransitionManager.Instance.TransitionFadeOut(TransitionType.Fade, () =>
         {
             TransitionManager.Instance.LoadScene(SceneType.Title);

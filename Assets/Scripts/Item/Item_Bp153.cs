@@ -76,10 +76,7 @@ public class Item_Bp153 : Item
 
     public override void OnShoot()
     {
-        if (duration < coolTime)
-        {
-            return;
-        }
+        if (duration < coolTime) return;
 
         duration -= coolTime;
 

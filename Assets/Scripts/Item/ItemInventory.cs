@@ -10,6 +10,6 @@ public class ItemInventory : MonoBehaviour
     public void Init(Item item)
     {
         itemIcon.sprite = item.ItemIcon;
-        itemNameText.text = item.GetName();
+        itemNameText.text = item.Name;
     }
 }
