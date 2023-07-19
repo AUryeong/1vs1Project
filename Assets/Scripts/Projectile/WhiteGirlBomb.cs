@@ -28,6 +28,9 @@ public class WhiteGirlBomb : MonoBehaviour
         warningPoison.gameObject.SetActive(true);
         bomb.gameObject.SetActive(true);
 
+        whitePoison.color = whitePoison.color.FadeChange(1);
+        
+        warningPoison.color = warningPoison.color.FadeChange(0.5f);
         warningPoison.DOFade(0.1f, 1).SetLoops(-1, LoopType.Yoyo);
 
         bomb.transform.localPosition = new Vector3(20, 20, -1);
