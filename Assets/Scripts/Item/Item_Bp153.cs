@@ -87,6 +87,7 @@ public class Item_Bp153 : Item
 
         Vector3 pos = GameManager.Instance.MainCamera.ScreenToWorldPoint(Input.mousePosition);
 
+        InGameManager.Instance.CameraShake(0.05f, 0.05f);
         bp153.OnCreate(pos, size);
     }
 

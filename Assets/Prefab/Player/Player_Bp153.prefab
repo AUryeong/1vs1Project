@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 5533494688915629818}
   m_Layer: 6
   m_Name: Player_Bp153
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -165,6 +165,7 @@ MonoBehaviour:
   xpAdd: 100
   lv: 0
   maxExp: 100
+  xpGetRadius: 100
   collisionEnemyList: []
   gun: {fileID: 5533494689028196174}
 --- !u!50 &5533494688915629819

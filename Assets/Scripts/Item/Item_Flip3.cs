@@ -79,6 +79,7 @@ public class Item_Flip3 : Item
 
         Vector3 pos = GameManager.Instance.MainCamera.ScreenToWorldPoint(Input.mousePosition);
 
+        InGameManager.Instance.CameraShake(0.1f, 0.15f);
         flip3.OnCreate(pos);
     }
 

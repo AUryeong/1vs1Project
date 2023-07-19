@@ -37,7 +37,7 @@
 
     public override float GetDamage(float damage)
     {
-        return base.GetDamage(damage) * 0.05f;
+        return base.GetDamage(damage) * 0.1f;
     }
 
     public override bool OnHit(Enemy enemy)

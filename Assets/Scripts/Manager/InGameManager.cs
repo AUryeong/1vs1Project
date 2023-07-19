@@ -18,6 +18,8 @@ public class InGameManager : Singleton<InGameManager>
     public bool isGaming;
     private float timer;
 
+    private float shakePower;
+
     [Header("¸Ê")] public Vector2 minPos;
     public Vector2 maxPos;
 
@@ -98,8 +100,16 @@ public class InGameManager : Singleton<InGameManager>
     {
         isBossLiving = false;
         lastTimer = timer;
-        PoolManager.Instance.ActionObjects("Enemy", (obj) => { obj.GetComponent<Enemy>().Die(); });
-        PoolManager.Instance.ActionObjects("Exp", (obj) => { obj.GetComponent<Exp>().OnGet(); });
+        if (stage == 1)
+        {
+            PoolManager.Instance.ActionObjects("Enemy", (obj) => { obj.GetComponent<Enemy>().Die(); });
+            PoolManager.Instance.ActionObjects("Exp", (obj) => { obj.GetComponent<Exp>().OnGet(); });
+        }
+        else
+        {
+            PoolManager.Instance.ActionObjects("Enemy", (obj) => { obj.gameObject.SetActive(false); });
+            PoolManager.Instance.ActionObjects("Exp", (obj) => { obj.gameObject.SetActive(false); });
+        }
         UIManager.Instance.BossRemoveSetting();
         switch (stage)
         {
@@ -264,7 +274,21 @@ public class InGameManager : Singleton<InGameManager>
     private void CameraMove()
     {
         Vector3 pos = Player.Instance.transform.position - cameraDistance;
+        pos += (Vector3)Random.insideUnitCircle * shakePower;
+        
         GameManager.Instance.MainCamera.transform.position = new Vector3(Mathf.Clamp(pos.x, minPos.x * 0.698f, maxPos.x * 0.698f), Mathf.Clamp(pos.y, minPos.y * 0.773f, maxPos.y * 0.773f), pos.z);
+    }
+
+    public void CameraShake(float duration, float power)
+    {
+        StartCoroutine(CameraShakeCoroutine(duration, power));
+    }
+
+    private IEnumerator CameraShakeCoroutine(float duration, float power)
+    {
+        shakePower += power;
+        yield return new WaitForSeconds(duration);
+        shakePower -= power;
     }
 
     public Vector3 GetPosInMap(Vector3 vector, float radius)

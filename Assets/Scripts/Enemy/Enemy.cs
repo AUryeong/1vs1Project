@@ -22,6 +22,7 @@ public class Enemy : Unit
     protected virtual void OnEnable()
     {
         stat.hp = stat.maxHp;
+        spriteRenderer.material = originalMaterial;
         spriteRenderer.color = Color.white;
         Dying = false;
     }
@@ -122,7 +123,7 @@ public class Enemy : Unit
     private IEnumerator HitFlashWhite()
     {
         spriteRenderer.material = InGameManager.Instance.flashWhiteMaterial;
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.1f);
         spriteRenderer.material = originalMaterial;
     }
 }

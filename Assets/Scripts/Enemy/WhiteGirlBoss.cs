@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class WhiteGirlBoss : Boss
@@ -93,6 +94,7 @@ public class WhiteGirlBoss : Boss
 
                 whiteShootParticle.gameObject.SetActive(true);
                 whiteShootParticle.Play();
+                InGameManager.Instance.CameraShake(0.5f, 0.1f);
                 return;
             }
 
@@ -104,6 +106,7 @@ public class WhiteGirlBoss : Boss
 
                 laserAnimator.gameObject.SetActive(true);
                 laserAnimator.SetBool(animShootingHash, true);
+                InGameManager.Instance.CameraShake(2.5f, 0.2f);
             }
         }
     }
@@ -135,5 +138,14 @@ public class WhiteGirlBoss : Boss
             direction = Direction.Right;
             transform.localScale = new Vector3(-1, 1, 1);
         }
+    }
+
+    public override void Die()
+    {
+        base.Die();
+        PoolManager.Instance.ActionObjects("WhiteGirlBomb", (obj) =>
+        {
+            obj.gameObject.SetActive(false);
+        });
     }
 }
