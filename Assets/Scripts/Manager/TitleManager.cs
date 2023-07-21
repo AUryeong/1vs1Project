@@ -2,16 +2,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using TMPro;
 
 public class TitleManager : MonoBehaviour
 {
     [Space(10f)] 
     [SerializeField] protected Image title;
-    
-    [Header("크레딧")]
-    [SerializeField] protected Image credit;
-    [SerializeField] private Image producerTop;
-    [SerializeField] private Image producerBottom;
     
     [Header("설정")]
     [SerializeField] protected Image setting;
@@ -19,7 +15,13 @@ public class TitleManager : MonoBehaviour
     [SerializeField] private Slider bgmSlider;
     [SerializeField] private Image sfxWhiteBox;
     [SerializeField] private Slider sfxSlider;
+    
+    [Header("크레딧")]
+    [SerializeField] protected Image credit;
+    [SerializeField] private TextMeshProUGUI producerTop;
+    [SerializeField] private TextMeshProUGUI producerBottom;
 
+    [Header("게임 방법")]
     [SerializeField] private Image howToPlay;
 
     private void Awake()

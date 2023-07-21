@@ -5173,7 +5173,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  characterType: 0
+  characterType: 1
 --- !u!4 &11327145
 Transform:
   m_ObjectHideFlags: 0
