@@ -3581,8 +3581,8 @@ MonoBehaviour:
   sfxWhiteBox: {fileID: 815015636}
   sfxSlider: {fileID: 709735703}
   credit: {fileID: 1323197196}
-  producerTop: {fileID: 642340449}
-  producerBottom: {fileID: 1865713400}
+  producerTop: {fileID: 1865713400}
+  producerBottom: {fileID: 642340449}
   howToPlay: {fileID: 389345581}
 --- !u!4 &988354860
 Transform:
@@ -6207,7 +6207,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC606\uAC31"
+  m_text: "\uACF5\uC96C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5f636d1a87c9b6744a474b1d869f8c43, type: 2}
   m_sharedMaterial: {fileID: -7072673957531863242, guid: 5f636d1a87c9b6744a474b1d869f8c43, type: 2}

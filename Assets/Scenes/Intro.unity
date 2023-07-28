@@ -1456,6 +1456,8 @@ MonoBehaviour:
     - {fileID: 3364302522111801633, guid: 744af1482e3d6944d92c682c3b3c91e7, type: 3}
     - {fileID: 8987225257436405367, guid: efd2c80b32eab444f94bfb5e0e59f3e8, type: 3}
     - {fileID: 4719538384270055376, guid: 02dac3003dfc6074f9b0e057ad245755, type: 3}
+    - {fileID: 8233962914493529341, guid: 52e626cca1d839045a09fe10f8e3f263, type: 3}
+    - {fileID: 8443407988183318293, guid: 1b04304e6c3760449ac10659c103991f, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -1474,7 +1476,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 10
+      Data: 12
     - Name: 
       Entry: 7
       Data: 
@@ -1799,6 +1801,74 @@ MonoBehaviour:
     - Name: poolingObjects
       Entry: 7
       Data: 21|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Special Edition Effect
+    - Name: $v
+      Entry: 7
+      Data: 22|PoolData, Assembly-CSharp
+    - Name: origin
+      Entry: 10
+      Data: 10
+    - Name: parent
+      Entry: 6
+      Data: 
+    - Name: poolingObjects
+      Entry: 7
+      Data: 23|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Plus3000 Effect
+    - Name: $v
+      Entry: 7
+      Data: 24|PoolData, Assembly-CSharp
+    - Name: origin
+      Entry: 10
+      Data: 11
+    - Name: parent
+      Entry: 6
+      Data: 
+    - Name: poolingObjects
+      Entry: 7
+      Data: 25|System.Collections.Generic.List`1[[UnityEngine.GameObject, UnityEngine.CoreModule]],
         mscorlib
     - Name: 
       Entry: 12

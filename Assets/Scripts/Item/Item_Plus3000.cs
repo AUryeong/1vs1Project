@@ -9,7 +9,7 @@ public class Item_Plus3000 : Item
 
     private float damagePercent;
 
-    private const float defaultDamagePercent = 0.1f;
+    private const float defaultDamagePercent = 0.2f;
     private const float thirdUpgradeDamagePercent = 1.2f;
     private const float sixthUpgradeDamagePercent = 1.3f;
 
@@ -112,9 +112,12 @@ public class Item_Plus3000 : Item
 
     public override void OnKill(Enemy killEnemy)
     {
-        if (skillDuration < 0 && Random.Range(0, 100) == 0)
+        if (skillDuration < 0 && Random.Range(0, 100) < 5)
         {
-            skillDuration += Time.deltaTime;
+            skillDuration = Time.deltaTime;
+            
+            GameObject effect = PoolManager.Instance.Init("Plus3000 Effect");
+            effect.transform.position = Player.Instance.transform.position;
         }
     }
 
