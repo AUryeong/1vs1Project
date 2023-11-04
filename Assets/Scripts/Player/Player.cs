@@ -65,11 +65,11 @@ public class Player : Unit
     private readonly Color hitTextColor = new Color(255 / 255f, 66 / 255f, 66 / 255f);
     private readonly Color healTextColor = new Color(101 / 255f, 255 / 255f, 76 / 255f);
     
-    private const float hitFadeInAlpha = 0.8f;
-    private const float hitFadeOutAlpha = 1f;
-    private const float hitFadeTime = 0.1f;
+    private const float HIT_FADE_IN_ALPHA = 0.8f;
+    private const float HIT_FADE_OUT_ALPHA = 1f;
+    private const float HIT_FADE_TIME = 0.1f;
 
-    private const float damageRandomPercent = 10;
+    private const float DAMAGE_RANDOM_PERCENT = 10;
 
     [HideInInspector] public List<Enemy> collisionEnemyList = new List<Enemy>();
 
@@ -89,7 +89,7 @@ public class Player : Unit
     protected Animator animator;
     protected Rigidbody2D rigid;
     
-    private static readonly int isWalkingHash = Animator.StringToHash("isWalking");
+    private static readonly int IS_WALKING_ANIMATION_HASH = Animator.StringToHash("isWalking");
 
     #endregion
 
@@ -140,7 +140,7 @@ public class Player : Unit
         else
         {
             rigid.velocity = Vector2.zero;
-            animator.SetBool(isWalkingHash, false);
+            animator.SetBool(IS_WALKING_ANIMATION_HASH, false);
         }
     }
 
@@ -184,7 +184,7 @@ public class Player : Unit
     public override float GetDamage()
     {
         float damage = stat.damage / 100 * defaultStat.damage;
-        damage += Random.Range(damage / -damageRandomPercent, damage / damageRandomPercent);
+        damage += Random.Range(damage / -DAMAGE_RANDOM_PERCENT, damage / DAMAGE_RANDOM_PERCENT);
         if (Random.Range(0f, 100f) <= stat.crit)
         {
             damage *= stat.critDmg / 100;
@@ -212,8 +212,8 @@ public class Player : Unit
         
         hurtInv = true;
 
-        spriteRenderer.DOFade(hitFadeInAlpha, hitFadeTime)
-            .OnComplete(() => spriteRenderer.DOFade(hitFadeOutAlpha, hitFadeTime).OnComplete(() => hurtInv = false));
+        spriteRenderer.DOFade(HIT_FADE_IN_ALPHA, HIT_FADE_TIME)
+            .OnComplete(() => spriteRenderer.DOFade(HIT_FADE_OUT_ALPHA, HIT_FADE_TIME).OnComplete(() => hurtInv = false));
         
         if (invAttack)
         {
@@ -306,7 +306,7 @@ public class Player : Unit
         {
             speedY -= stat.speed / 100 * defaultStat.speed;
         }
-        animator.SetBool(isWalkingHash, speedX != 0 || speedY != 0);
+        animator.SetBool(IS_WALKING_ANIMATION_HASH, speedX != 0 || speedY != 0);
         IsMoving = speedX != 0 || speedY != 0;
 
         rigid.velocity = new Vector2(speedX, speedY );
